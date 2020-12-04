@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ba041052-9100-4a73-a24b-d518ee8d7200" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
+  <component name="ProjectId" id="1b1Y9Z911BQlXP4Nku3Ydaj89ui" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../fenli-qingdadao/vue-qingdadao" />
+    <property name="nodejs_interpreter_path" value="node" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <package-manager value="npm" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.start" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ba041052-9100-4a73-a24b-d518ee8d7200" name="Default Changelist" comment="" />
+      <created>1587800916010</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1587800916010</updated>
+      <workItem from="1587800918349" duration="1306000" />
+      <workItem from="1587802253206" duration="173000" />
+      <workItem from="1587802442890" duration="700000" />
+      <workItem from="1587803161257" duration="648000" />
+      <workItem from="1587865227557" duration="756000" />
+      <workItem from="1587888383489" duration="217000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="309" y="0" key="#start" timestamp="1587800955605">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="309" y="0" key="#start/0.0.1280.680@0.0.1280.680" timestamp="1587800955605" />
+    <state x="368" y="37" key="FileChooserDialogImpl" timestamp="1587804670824">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="368" y="37" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1587804670824" />
+    <state width="1255" height="150" key="GridCell.Tab.0.bottom" timestamp="1587802227588">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1255" height="150" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1587802227588" />
+    <state width="1255" height="150" key="GridCell.Tab.0.center" timestamp="1587802227588">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1255" height="150" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1587802227588" />
+    <state width="1255" height="150" key="GridCell.Tab.0.left" timestamp="1587802227588">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1255" height="150" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1587802227588" />
+    <state width="1255" height="150" key="GridCell.Tab.0.right" timestamp="1587802227588">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state width="1255" height="150" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1587802227588" />
+    <state x="33" y="0" key="SettingsEditor" timestamp="1587804662371">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="33" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1587804662371" />
+  </component>
+</project>
