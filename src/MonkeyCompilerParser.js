@@ -3,10 +3,7 @@ class Node {
     constructor (props) {
         this.tokenLiteral = ""
         this.type = ""
-        // change 
-        getType=()=>{
-          return this.type
-        }
+
 
         this.lineNumber =  Number.MAX_SAFE_INTEGER
         for (var i in props) {
@@ -798,9 +795,9 @@ class MonkeyCompilerParser {
        var props = {}
        props.token = this.curToken
        props.expression = this.parseExpression(this.LOWEST)
-       var stmt = new ExpressionStatement(props)
+        const stmt = new ExpressionStatement(props);
 
-       if (this.peekTokenIs(this.lexer.SEMICOLON)) {
+        if (this.peekTokenIs(this.lexer.SEMICOLON)) {
            this.nextToken()
        }
 
