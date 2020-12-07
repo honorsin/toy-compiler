@@ -1,4 +1,5 @@
 class Token {
+	//type--token类型 literal--token内容 --lineNumber--行号
 	constructor(type, literal, lineNumber) {
         this.tokenType = type
         this.literal = literal
@@ -16,8 +17,7 @@ class Token {
 	getLineNumber() {
 		return this.lineNumber
 	}
-
-};
+}
 
 class MonkeyLexer {
 
@@ -35,6 +35,7 @@ class MonkeyLexer {
 	}
 
 	initTokenType() {
+		//这样设计只是为了我们可读方便
         this.ILLEGAL = -2
 	    this.EOF = -1  //文本末尾终结符
 	    this.LET = 0
@@ -115,7 +116,7 @@ class MonkeyLexer {
 		    case this.TRUE:
 		      return "true"
 		    case this.FALSE:
-		      return "fasle"
+		      return "false"
 		    case this.RETURN:
 		      return "return"
 		    case this.LEFT_BRACE:
@@ -130,30 +131,26 @@ class MonkeyLexer {
 		      return "("
 		    case this.RIGHT_PARENT:
 		      return ")"
-            // change 5
-            case this.LEFT_BRACE:
-              return "{"
-            case this.RIGHT_BRACE:
-              return "}"
             case this.COLON:
               return ":"
-           
+			default:
+				return
 		}
 	}
 
 	initKeywords() {
 		this.keyWordMap = [];
-		this.keyWordMap["let"] = new Token(this.LET, "let", 0)
-		this.keyWordMap["if"] = new Token(this.IF, "if", 0)
-		this.keyWordMap["else"] = new Token(this.ELSE, "else", 0)
+		this.keyWordMap["let"] = new Token(this.LET, "let", 1)
+		this.keyWordMap["if"] = new Token(this.IF, "if", 1)
+		this.keyWordMap["else"] = new Token(this.ELSE, "else", 1)
 
-		this.keyWordMap["fn"] = new Token(this.FUNCTION, "fn", 0)
-		this.keyWordMap["true"] = new Token(this.TRUE, "true", 0)
-		this.keyWordMap["false"] = new Token(this.FALSE, "false", 0)
-		this.keyWordMap["return"] = new Token(this.RETURN, "return", 0)
+		this.keyWordMap["fn"] = new Token(this.FUNCTION, "fn", 1)
+		this.keyWordMap["true"] = new Token(this.TRUE, "true", 1)
+		this.keyWordMap["false"] = new Token(this.FALSE, "false", 1)
+		this.keyWordMap["return"] = new Token(this.RETURN, "return", 1)
 	}
 
-	setLexingOberver(o, context) {
+	setLexingObserver(o, context) {
 		if (o !== null && o !== undefined) {
 			this.observer = o
 			this.observerContext = context
@@ -186,7 +183,8 @@ class MonkeyLexer {
 		/*
 		忽略空格
 		*/
-		while (this.ch === ' ' || this.ch === '\t' 
+		while (this.ch === ' '
+			|| this.ch === '\t'  //回车换行
 			|| this.ch === '\u00a0'
 			|| this.ch === '\n') {
 		    if (this.ch === '\t' || this.ch === '\n') {
@@ -197,15 +195,15 @@ class MonkeyLexer {
 	}
 
 	nextToken () {
-		var tok
+		let tok
 		this.skipWhiteSpaceAndNewLine() 
-		var lineCount = this.lineCount
-		var needReadChar = true;
+		let lineCount = this.lineCount
+		let needReadChar = true;
 		this.position = this.readPosition
 
 		switch (this.ch) {
 			case '"':
-			var str = this.readString()
+			const str = this.readString()
 			if (str === undefined) {
 				tok = new Token(this.ILLEGAL, undefined, lineCount)
 			} else {
@@ -255,12 +253,6 @@ class MonkeyLexer {
 			case ',':
 			tok = new Token(this.COMMA, ",", lineCount)
 			break;
-			case '{':
-			tok = new Token(this.LEFT_BRACE, "{", lineCount)
-			break;
-			case '}':
-			tok = new Token(this.RIGHT_BRACE, "}", lineCount)
-			break;
 			case '(':
 		    tok = new Token(this.LEFT_PARENT, "(", lineCount)
 		    break;
@@ -284,18 +276,17 @@ class MonkeyLexer {
 			tok = new Token(this.COLON, ":", lineCount)
 			break
 			default:
-			var res = this.readIdentifier()
+			let res = this.readIdentifier()  //判断是不是26个字母或下划线
 			if (res !== false) {
 				if (this.keyWordMap[res] !== undefined) {
-					// change
-					var keyword = this.keyWordMap[res]
+					const keyword = this.keyWordMap[res]
 					tok = new Token(keyword.getType(), 
 						keyword.getLiteral(), lineCount)
 				} else {
 					tok = new Token(this.IDENTIFIER, res, lineCount)
 				}
 			} else {
-				res = this.readNumber()
+				res = this.readNumber() //数字字符串
 				if (res !== false) {
 					tok = new Token(this.INTEGER, res, lineCount)
 				}
@@ -321,13 +312,13 @@ class MonkeyLexer {
 	readString() {
 		// 越过开始的双引号
 		this.readChar()
-		var str =""
-		while (this.ch != '"' && this.ch != this.EOF) {
+		let str =""
+		while (this.ch !== '"' && this.ch !== this.EOF) {
 			str += this.ch
 			this.readChar()
 		}
 
-		if (this.ch != '"') {
+		if (this.ch !== '"') {
 			return undefined
 		}
 
@@ -351,8 +342,8 @@ class MonkeyLexer {
 	}
 
 	readIdentifier() {
-		var identifier = ""
-		var charBegin = false 
+		let identifier = ""
+		let charBegin = false
 		if (this.isLetter(this.ch)) {
 			charBegin = true 
 		}
@@ -375,7 +366,7 @@ class MonkeyLexer {
 	}
 
 	readNumber() {
-		var number = ""
+		let number = ""
 		while (this.isDigit(this.ch)) {
 			number += this.ch
 			this.readChar()
@@ -391,14 +382,14 @@ class MonkeyLexer {
 	lexing() {
 		this.readChar()
 		this.tokens = []
-		var token = this.nextToken()
+		let token = this.nextToken()
 		while(token !== undefined && 
 			token.getType() !== this.EOF) {
 			this.tokens.push(token)
 			token = this.nextToken()
 		}
+			this.tokens.push(token)
 
-		this.tokens.push(token)
 	}
 }
 

@@ -3,10 +3,8 @@ class Node {
     constructor (props) {
         this.tokenLiteral = ""
         this.type = ""
-
-
         this.lineNumber =  Number.MAX_SAFE_INTEGER
-        for (var i in props) {
+        for (const i in props) {
           if (props[i].getLineNumber !== undefined) {
             console.log(props[i].getLineNumber)
             console.log("line: " + props[i].getLineNumber())
@@ -75,7 +73,7 @@ class ReturnStatement extends Statement{
     super(props)
     this.token = props.token
     this.expression = props.expression
-    var s = "return with " + this.expression.getLiteral()
+    const s = "return with " + this.expression.getLiteral()
     this.tokenLiteral = s
     this.type = "ReturnStatement"
   }
@@ -87,7 +85,7 @@ class ExpressionStatement extends Statement {
     super(props)
     this.token = props.token
     this.expression = props.expression
-    var s = "expression: " + this.expression.getLiteral()
+    const s = "expression: " + this.expression.getLiteral()
     this.tokenLiteral = s
     this.type = "ExpressionStatement"
   }
@@ -99,7 +97,7 @@ class PrefixExpression extends Expression {
     this.token = props.token
     this.operator = props.operator
     this.right = props.expression
-    var s = "(" + this.operator + this.right.getLiteral() + " )"
+    const s = "(" + this.operator + this.right.getLiteral() + " )"
     this.tokenLiteral = s
     this.type = "PrefixExpression"
   }
@@ -409,7 +407,7 @@ class MonkeyCompilerParser {
     }
 
     peekPrecedence() {
-      var p = this.precedencesMap[this.peekToken.getType()]
+      const p = this.precedencesMap[this.peekToken.getType()]
       if (p !== undefined) {
         return p
       }
@@ -491,8 +489,8 @@ class MonkeyCompilerParser {
       var props = {}
       props.token = caller.curToken
       props.elements = caller.parseExpressionList(caller.lexer.RIGHT_BRACKET)
-      var obj = new ArrayLiteral(props)
-      console.log("parsing array result: ", obj.getLiteral())
+        const obj = new ArrayLiteral(props);
+        console.log("parsing array result: ", obj.getLiteral())
       return obj
     }
    //解析数组表达式
@@ -717,7 +715,7 @@ class MonkeyCompilerParser {
 
     parseProgram() {
         while (this.curToken.getType() !== this.lexer.EOF) {
-            var stmt = this.parseStatement()
+            const stmt = this.parseStatement()
             if (stmt !== null) {
                 // change 3
                 var token = this.curToken.getType()
@@ -778,7 +776,7 @@ class MonkeyCompilerParser {
            return null
        }
 
-       var exprProps = {}
+       let exprProps = {}
        exprProps.token = this.curToken
        this.nextToken()
        props.expression = this.parseExpression(this.LOWEST)
@@ -787,8 +785,7 @@ class MonkeyCompilerParser {
            return null
        }
 
-       var letStatement = new LetStatement(props)
-       return letStatement
+       return new LetStatement(props)
     }
 
     parseExpressionStatement() {
@@ -805,7 +802,7 @@ class MonkeyCompilerParser {
     }
 
     parseExpression(precedence) {
-        var prefix = this.prefixParseFns[this.curToken.getType()]
+        const prefix = this.prefixParseFns[this.curToken.getType()]
         if (prefix === null) {
             console.log("no parsing function found for token " + 
               this.curToken.getLiteral())
@@ -844,7 +841,7 @@ class MonkeyCompilerParser {
     }
       //前序表达式
     parsePrefixExpression(caller) {
-      var props = {}
+      let props = {}
       props.token = caller.curToken
       props.operator = caller.curToken.getLiteral()  //operator-操作符
       caller.nextToken()

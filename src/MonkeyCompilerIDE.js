@@ -2,17 +2,15 @@ import React , {Component} from 'react'
 import * as bootstrap from 'react-bootstrap'
 import MonkeyLexer from './MonkeyLexer'
 import MonkeyCompilerEditer from './MonkeyCompilerEditer'
-import MonkeyCompilerParser from './MonkeyCompilerParser'
-import MonkeyEvaluator from './MonkeyEvaluator'
 import Worker from './channel.worker'
 
 class MonkeyCompilerIDE extends Component {
+
     constructor(props) {
         super(props)
         this.lexer = new MonkeyLexer("")
         this.state = {stepEnable: false}
         this.breakPointMap = null
-        // change 1
         this.channelWorker = new Worker()
     }
 
@@ -20,7 +18,6 @@ class MonkeyCompilerIDE extends Component {
       this.breakPointMap = bpMap
     }
 
-// change 2
     onLexingClick () { 
       this.inputInstance.setIDE(this)
       this.channelWorker.postMessage(['code', this.inputInstance.getContent()])
@@ -29,23 +26,21 @@ class MonkeyCompilerIDE extends Component {
    } 
 
    handleMsgFromChannel(e) {
-     var cmd = e.data
+     let cmd = e.data
      if (Array.isArray(e.data)) {
       cmd = e.data[0]
      }
-
+       let execInfo = e.data[1]
      if (cmd === "beforeExec") {
         console.log("receive before execBefore msg from channel worker")
         this.setState({stepEnable: true})
-        var execInfo = e.data[1]
         this.currentLine = execInfo['line']
         this.currentEnviroment = execInfo['env']
         this.inputInstance.hightlineByLine(execInfo['line'], true)
      } else if (cmd === "finishExec") {
         console.log("receive finishExec msg: ", e.data[1])
-        var execInfo = e.data[1]
-        this.currentEnviroment = execInfo['env']
-        alert("exec finish")
+         this.currentEnviroment = execInfo['env']
+        //alert("exec finish")
      }
    }
 
@@ -65,12 +60,7 @@ class MonkeyCompilerIDE extends Component {
       return this.currentEnviroment
     }
 
-  
-
-   
-
     render () {
-      // change 1
         return (
           <bootstrap.Panel header="Monkey Compiler" bsStyle="success">
             <MonkeyCompilerEditer 

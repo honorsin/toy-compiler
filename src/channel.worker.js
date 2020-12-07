@@ -38,7 +38,7 @@ function handleMessage(event) {
     console.log("channel worker receive msg execNext ")
     var int32 = new Int32Array(this.sharedMem)
     Atomics.store(int32, 0, 123)
-    Atomics.wake(int32, 0, 1)
+    Atomics.notify(int32, 0, 1)
     return
     default:
     this.postMessage(event.data)

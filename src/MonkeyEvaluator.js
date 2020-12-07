@@ -250,7 +250,7 @@ class MonkeyEvaluator {
 			if (args.length != 1) {
 				return this.newError("Wrong number of arguments when calling len")
 			} 
-			if (args[0].type() != args[0].ARRAY_OBJ) {
+			if (args[0].type() !== args[0].ARRAY_OBJ) {
 				return this.newError("arguments of first must be ARRAY")
 			}
 			if (args[0].elements.length > 1) {
@@ -361,7 +361,7 @@ class MonkeyEvaluator {
 			  return  obj
 			case "String":
 			  props.value = node.tokenLiteral
-			  return new String(props)
+			  return String(props)
 
 			case "LetStatement":
 			  // change

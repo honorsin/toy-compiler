@@ -40,13 +40,15 @@ class MonkeyCompilerEditer extends Component {
   }
 
   initPopoverControl() {
-    this.state = {};
-    this.state.popoverStyle = {};
-    this.state.popoverStyle.placement = "right";
-    this.state.popoverStyle.positionLeft = -100;
-    this.state.popoverStyle.positionTop = -100;
-    this.state.popoverStyle.content = "";
-    this.setState(this.state);
+    this.state = {
+      popoverStyle: {
+        placement: "right",
+        positionLeft: -100,
+        positionTop: -100,
+        title: "",
+        content: ""
+      }
+    };
   }
 
   getContent() {
@@ -55,8 +57,8 @@ class MonkeyCompilerEditer extends Component {
   // dom树，找到节点，提供给lexer进行分词
   changeNode(n) {
     var f = n.childNodes;
-    for (var c in f) {
-      this.changeNode(f[c]);
+    for (const node of f) {
+      this.changeNode(node);
     }
     if (n.data) {
       this.lastBegin = 0;
@@ -64,7 +66,7 @@ class MonkeyCompilerEditer extends Component {
       n.identifierCount = 0;
       var lexer = new MonkeyLexer(n.data);
       this.lexer = lexer;
-      lexer.setLexingOberver(this, n);
+      lexer.setLexingObserver(this, n);
       lexer.lexing();
     }
   }
@@ -95,6 +97,7 @@ class MonkeyCompilerEditer extends Component {
       this.lastBegin,
       begin - this.lastBegin
     );
+    //空格转换为unicode
     strBefore = this.changeSpaceToNBSP(strBefore);
 
     var textNode = document.createTextNode(strBefore);
@@ -210,16 +213,16 @@ class MonkeyCompilerEditer extends Component {
   }
 
   createBreakPoint(elem) {
-    if (elem.classList.item(0) != this.lineSpanNode) {
+    if (elem.classList.item(0) !== this.lineSpanNode) {
       return;
     }
     //是否已存在断点，是的话就取消断点
     if (elem.dataset.bp === "true") {
-      var bp = elem.previousSibling;
+      let bp = elem.previousSibling;
       bp.remove();
-      elem.dataset.bp = false;
+      elem.dataset.bp = "false";
       delete this.bpMap["" + elem.dataset.lineNum];
-      if (this.ide != null) {
+      if (this.ide) {
         this.ide.updateBreakPointMap(this.bpMap);
       }
       return;
@@ -228,7 +231,7 @@ class MonkeyCompilerEditer extends Component {
     //构造一个红色圆点
     elem.dataset.bp = true;
     this.bpMap["" + elem.dataset.lineNum] = elem.dataset.lineNum;
-    var bp = document.createElement("span");
+    const bp = document.createElement("span");
     bp.style.height = "10px";
     bp.style.width = "10px";
     bp.style.backgroundColor = "red";
@@ -243,17 +246,19 @@ class MonkeyCompilerEditer extends Component {
 
   handleIdentifierOnMouseOver(e) {
     e.currentTarget.isOver = true;
-    var token = e.currentTarget.token;
-    this.state.popoverStyle.positionLeft = e.clientX + 5;
-    this.state.popoverStyle.positionTop =
-      e.currentTarget.offsetTop - e.currentTarget.offsetHeight;
-    this.state.popoverStyle.title = "Syntax";
-    this.state.popoverStyle.content =
-      "name:" + token.getLiteral() + "\nType:" + token.getType();
+    const token = e.currentTarget.token;
+    this.setState({
+      popoverStyle:{
+        positionLeft:e.clientX + 5,
+        positionTop:e.currentTarget.offsetTop - e.currentTarget.offsetHeight,
+        title:"Syntax",
+        content:  "name:" + token.getLiteral() + "\nType:" + token.getType()
+      }
+    })
 
     // change
-    if (this.ide != null) {
-      var env = this.ide.getSymbolInfo(token.getLiteral());
+    if (this.ide) {
+      const env = this.ide.getSymbolInfo(token.getLiteral());
       if (env) {
         this.state.popoverStyle.title = token.getLiteral();
         this.state.popoverStyle.content = env;
@@ -263,7 +268,7 @@ class MonkeyCompilerEditer extends Component {
     this.setState(this.state);
   }
 
-  handleIdentifierOnMouseOut(e) {
+  handleIdentifierOnMouseOut() {
     this.initPopoverControl();
   }
 
@@ -331,9 +336,9 @@ class MonkeyCompilerEditer extends Component {
     var lineClass = this.lineNodeClass + line;
     var spans = document.getElementsByClassName(lineClass);
     // change 4
-    if (spans !== null && hightLine == true) {
+    if (spans !== null && hightLine === true) {
       var span = spans[0];
-      span.style.backgroundColor = "yellow";
+      span.style.backgroundColor = "blue";
       var arrow = document.createElement("span");
       arrow.classList.add("glyphicon");
       arrow.classList.add("glyphicon-circle-arrow-right");
@@ -341,10 +346,10 @@ class MonkeyCompilerEditer extends Component {
       span.parentNode.insertBefore(arrow, span);
     }
 
-    if (spans !== null && hightLine == false) {
-      var span = spans[0];
+    if (spans !== null && hightLine === false) {
+      let span = spans[0];
       span.style.backgroundColor = "white";
-      var arrow = document.getElementsByClassName("ArrowRight");
+      let arrow = document.getElementsByClassName("ArrowRight");
       if (arrow !== undefined) {
         arrow[0].parentNode.removeChild(arrow[0]);
       }
@@ -363,8 +368,8 @@ class MonkeyCompilerEditer extends Component {
     }
 
     //每当有输入只重新词法解析当前行
-    var currentLine = this.getCaretLineNode();
-    for (var i = 0; i < currentLine.childNodes.length; i++) {
+    let currentLine = this.getCaretLineNode();
+    for (let i = 0; i < currentLine.childNodes.length; i++) {
       if (
         currentLine.childNodes[i].className === this.keyWordClass ||
         currentLine.childNodes[i].className === this.identifierClass
@@ -405,8 +410,8 @@ class MonkeyCompilerEditer extends Component {
         只有把pointerEvent设置为空而不是none时，这个时间才能传递给
         span
         */
-    var lineSpans = document.getElementsByClassName(this.lineSpanNode);
-    for (var i = 0; i < lineSpans.length; i++) {
+    const lineSpans = document.getElementsByClassName(this.lineSpanNode);
+    for (let i = 0; i < lineSpans.length; i++) {
       lineSpans[i].style.pointerEvents = "";
     }
   }
