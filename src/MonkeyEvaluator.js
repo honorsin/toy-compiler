@@ -1,7 +1,7 @@
 import Node from './MonkeyCompilerParser'
 
 class BaseObject {
-	constructor (props) {
+	constructor () {
 		this.INTEGER_OBJ = "INTEGER"
 		this.BOOLEAN_OBJ = "BOOLEAN"
 		this.NULL_OBJ = "NULL"
@@ -97,7 +97,7 @@ class Integer extends BaseObject {
 	}
 }
 
-class Boolean extends BaseObject {
+class BooleanCtr extends BaseObject {
 	constructor (props) {
 		super(props)
 		this.value = props.value
@@ -216,7 +216,6 @@ export class Enviroment {
 }
 
 class MonkeyEvaluator {
-	// change1
 	constructor (worker) {
 		this.enviroment = new Enviroment()
 		this.evalWorker = worker
@@ -263,7 +262,7 @@ class MonkeyEvaluator {
 				}
 				return null
 			case "append":
-				if (args.length != 2) {
+				if (args.length !== 2) {
 					return this.newError("Wrong number of arguments when calling len")
 				}
 				if (args[0].type() != args[0].ARRAY_OBJ) {
@@ -338,7 +337,7 @@ class MonkeyEvaluator {
 				if (elements.length === 1 && this.isError(elements[0])) {
 					return elements[0]
 				}
-				var props = {}
+				let props = {}
 				props.elements = elements
 				return new Array(props)
 			case "IndexExpression":
@@ -384,11 +383,11 @@ class MonkeyEvaluator {
 				props.token = node.token
 				props.identifiers = node.parameters
 				props.blockStatement = node.body
-				var funObj = new FunctionCall(props)
+				const funObj = new FunctionCall(props)
 				funObj.enviroment  = this.newEnclosedEnvironment(this.enviroment, props.token)
 				return  funObj
 			case "CallExpression":
-				// change
+
 				this.pauseBeforeExec(node)
 
 				var args = this.evalExpressions(node.arguments)
@@ -396,7 +395,7 @@ class MonkeyEvaluator {
 					return args[0]
 				}
 
-				var functionCall = this.eval(node.function)
+				const functionCall = this.eval(node.function)
 				if (this.isError(functionCall)) {
 					return this.builtins(node.function.tokenLiteral, args)
 				}
@@ -436,14 +435,10 @@ class MonkeyEvaluator {
 			case "Boolean":
 				props.value = node.value
 				console.log("Boolean with value:", node.value)
-				return new Boolean(props)
+				return new BooleanCtr(props)
 			case "ExpressionStatement":
-				// change
 				this.pauseBeforeExec(node)
-
-				var res = this.eval(node.expression)
-
-				return res
+				return this.eval(node.expression)
 			case "PrefixExpression":
 				// change
 				this.pauseBeforeExec(node)
@@ -712,17 +707,17 @@ class MonkeyEvaluator {
 				left, right)
 		}
 
-		var props = {}
-		if (operator == '==') {
+		const props = {}
+		if (operator === '==') {
 			props.value = (left.vaule == right.value)
 			console.log("result on boolean operation of " + operator
 				+ " is " + props.value)
-			return new Boolean(props)
-		} else if (operator == '!=') {
+			return new BooleanCtr(props)
+		} else if (operator === '!=') {
 			props.value = (left.value != right.value)
 			console.log("result on boolean operation of " + operator
 				+ " is " + props.value)
-			return new Boolean(props)
+			return new BooleanCtr(props)
 		}
 
 		return  this.newError("unknown operator: "+ operator)
@@ -785,7 +780,7 @@ class MonkeyEvaluator {
 		if (resultType === "integer") {
 			result = new Integer(props)
 		} else if (resultType === "boolean") {
-			result = new Boolean(props)
+			result = new BooleanCtr(props)
 		}
 
 		return result
@@ -821,17 +816,17 @@ class MonkeyEvaluator {
 				props.value = false
 			}
 		}
-
+		//null取反为true
 		if (right.type() === right.NULL_OBJ) {
 			props.value = true
 		}
 
-		return new Boolean(props)
+		return new BooleanCtr(props)
 	}
 
 	evalMinusPrefixOperatorExpression(right) {
 		if (right.type() !== right.INTEGER_OBJ) {
-			return new this.newError("unknown operaotr:- ", right.type())
+			return new this.newError("unknown operator:- ", right.type())
 		}
 
 		var props = {}

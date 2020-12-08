@@ -29,9 +29,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba041052-9100-4a73-a24b-d518ee8d7200" name="Default Changelist" comment="优化重构v1">
+      <change beforePath="$PROJECT_DIR$/.idea/monkey_compiler.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/monkey_compiler.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MonkeyCompilerIDE.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyCompilerIDE.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MonkeyCompilerParser.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyCompilerParser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__MACOSX/src/._.DS_Store" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MonkeyEvaluator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyEvaluator.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +42,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="Nostep" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -132,7 +132,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="Nostep" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
