@@ -122,7 +122,7 @@ class IntegerLiteral extends Expression {
     }
 }
 
-class Boolean extends Expression {
+class BooleanCtr extends Expression {
   constructor(props) {
     super(props)
     this.token = props.token
@@ -521,8 +521,7 @@ class MonkeyCompilerParser {
       const props = {}
       props.token = caller.curToken
       props.value = caller.curTokenIs(caller.lexer.TRUE)
-        //TODO
-      return new Boolean(props)
+      return new BooleanCtr(props)
     }
 
     parseGroupedExpression(caller) {

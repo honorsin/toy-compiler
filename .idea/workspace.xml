@@ -23,23 +23,16 @@
       <path>
         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
         <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="BRANCH:Nostep" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:master" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </select>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba041052-9100-4a73-a24b-d518ee8d7200" name="Default Changelist" comment="优化重构v1">
-      <change afterPath="$PROJECT_DIR$/astExample.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MonkeyCompilerEditer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyCompilerEditer.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MonkeyCompilerIDE.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyCompilerIDE.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MonkeyCompilerParser.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyCompilerParser.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MonkeyEvaluator.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyEvaluator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/MonkeyLexer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/MonkeyLexer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/channel.worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/channel.worker.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/eval.worker.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval.worker.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,6 +143,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="优化重构v1" />
@@ -168,22 +162,22 @@
       <screen x="0" y="0" width="1024" height="640" />
     </state>
     <state x="250" y="74" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1024.640@0.0.1024.640" timestamp="1607233528732" />
-    <state width="984" height="144" key="GridCell.Tab.0.bottom" timestamp="1607349636428">
+    <state width="984" height="144" key="GridCell.Tab.0.bottom" timestamp="1607414163830">
       <screen x="0" y="0" width="1024" height="640" />
     </state>
-    <state width="984" height="144" key="GridCell.Tab.0.bottom/0.0.1024.640@0.0.1024.640" timestamp="1607349636428" />
-    <state width="984" height="144" key="GridCell.Tab.0.center" timestamp="1607349636426">
+    <state width="984" height="144" key="GridCell.Tab.0.bottom/0.0.1024.640@0.0.1024.640" timestamp="1607414163830" />
+    <state width="984" height="144" key="GridCell.Tab.0.center" timestamp="1607414163828">
       <screen x="0" y="0" width="1024" height="640" />
     </state>
-    <state width="984" height="144" key="GridCell.Tab.0.center/0.0.1024.640@0.0.1024.640" timestamp="1607349636426" />
-    <state width="984" height="144" key="GridCell.Tab.0.left" timestamp="1607349636426">
+    <state width="984" height="144" key="GridCell.Tab.0.center/0.0.1024.640@0.0.1024.640" timestamp="1607414163828" />
+    <state width="984" height="144" key="GridCell.Tab.0.left" timestamp="1607414163827">
       <screen x="0" y="0" width="1024" height="640" />
     </state>
-    <state width="984" height="144" key="GridCell.Tab.0.left/0.0.1024.640@0.0.1024.640" timestamp="1607349636426" />
-    <state width="984" height="144" key="GridCell.Tab.0.right" timestamp="1607349636427">
+    <state width="984" height="144" key="GridCell.Tab.0.left/0.0.1024.640@0.0.1024.640" timestamp="1607414163827" />
+    <state width="984" height="144" key="GridCell.Tab.0.right" timestamp="1607414163829">
       <screen x="0" y="0" width="1024" height="640" />
     </state>
-    <state width="984" height="144" key="GridCell.Tab.0.right/0.0.1024.640@0.0.1024.640" timestamp="1607349636427" />
+    <state width="984" height="144" key="GridCell.Tab.0.right/0.0.1024.640@0.0.1024.640" timestamp="1607414163829" />
     <state x="13" y="0" key="SettingsEditor" timestamp="1607314415564">
       <screen x="0" y="0" width="1024" height="640" />
     </state>

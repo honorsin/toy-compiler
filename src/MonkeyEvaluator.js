@@ -1,4 +1,4 @@
-
+import Node from './MonkeyCompilerParser'
 
 class BaseObject {
 	constructor (props) {
@@ -11,7 +11,6 @@ class BaseObject {
 		this.FUNCTION_CALL = "FunctionCall"
 		this.STRING_OBJ = "String"
 		this.ARRAY_OBJ = "Array"
-		// change 1
 		this.HASH_OBJ = "Hash"
 	}
 
@@ -20,7 +19,6 @@ class BaseObject {
 	inspect() {return null}
 }
 
-// change 2
 class Hash extends BaseObject {
 	constructor(props) {
 		super(props)
@@ -193,11 +191,13 @@ class FunctionCall extends BaseObject {
 	}
 }
 
-class Enviroment {
-	constructor(props) {
+export class Enviroment {
+	constructor() {
 		this.map = {}
 		this.outer = undefined
 	}
+
+
 	get(name) {
 		var obj = this.map[name]
 		if (obj != undefined) {
@@ -216,15 +216,19 @@ class Enviroment {
 }
 
 class MonkeyEvaluator {
-	constructor (props) {
+	// change1
+	constructor (worker) {
 		this.enviroment = new Enviroment()
+		this.evalWorker = worker
 	}
+
 
 	newEnclosedEnvironment(outerEnv) {
 		var env = new Enviroment()
 		env.outer = outerEnv
 		return env
 	}
+
 
 	builtins (name, args) {
 		//实现内嵌API
@@ -297,15 +301,39 @@ class MonkeyEvaluator {
 		return this.newError("unknown function call")
 	}
 
+	//change2
+	setExecInfo(node) {
+		var props = {}
+		if (node != undefined) {
+			props['line'] = node.getLineNumber()
+		}
+
+		var env = {}
+		for (var s in this.enviroment.map) {
+			env[s] = this.enviroment.map[s].inspect()
+		}
+		props['env'] = env
+		return props
+	}
+
+	pauseBeforeExec(node) {
+		// change
+		var props = this.setExecInfo(node)
+		this.evalWorker.sendExecInfo("beforeExec", props)
+		this.evalWorker.waitBeforeEval()
+	}
+
 	eval (node) {
 		var props = {}
 		switch (node.type) {
 			case "program":
 				return this.evalProgram(node)
-			//change 3
 			case "HashLiteral":
 				return this.evalHashLiteral(node)
 			case "ArrayLiteral":
+				// change3
+				this.pauseBeforeExec(node)
+
 				var elements = this.evalExpressions(node.elements)
 				if (elements.length === 1 && this.isError(elements[0])) {
 					return elements[0]
@@ -314,6 +342,9 @@ class MonkeyEvaluator {
 				props.elements = elements
 				return new Array(props)
 			case "IndexExpression":
+				// change
+				this.pauseBeforeExec(node)
+
 				var left = this.eval(node.left)
 				if (this.isError(left)) {
 					return left
@@ -333,6 +364,9 @@ class MonkeyEvaluator {
 				return new String(props)
 
 			case "LetStatement":
+				// change
+				this.pauseBeforeExec(node)
+
 				var val = this.eval(node.value)
 				if (this.isError(val)) {
 					return val
@@ -351,13 +385,12 @@ class MonkeyEvaluator {
 				props.identifiers = node.parameters
 				props.blockStatement = node.body
 				var funObj = new FunctionCall(props)
-				funObj.enviroment  = this.newEnclosedEnvironment(this.enviroment)
+				funObj.enviroment  = this.newEnclosedEnvironment(this.enviroment, props.token)
 				return  funObj
 			case "CallExpression":
-				console.log("execute a function with content:",
-					node.function.tokenLiteral)
+				// change
+				this.pauseBeforeExec(node)
 
-				console.log("evalute function call params:")
 				var args = this.evalExpressions(node.arguments)
 				if (args.length === 1 && this.isError(args[0])) {
 					return args[0]
@@ -385,9 +418,11 @@ class MonkeyEvaluator {
 				var result = this.eval(functionCall.blockStatement)
 				//执行完函数后，里面恢复原有绑定环境
 				this.enviroment = oldEnviroment
+
 				if (result.type() === result.RETURN_VALUE_OBJECT) {
 					console.log("function call return with :",
 						result.valueObject.inspect())
+
 					return result.valueObject
 				}
 
@@ -403,8 +438,16 @@ class MonkeyEvaluator {
 				console.log("Boolean with value:", node.value)
 				return new Boolean(props)
 			case "ExpressionStatement":
-				return this.eval(node.expression)
+				// change
+				this.pauseBeforeExec(node)
+
+				var res = this.eval(node.expression)
+
+				return res
 			case "PrefixExpression":
+				// change
+				this.pauseBeforeExec(node)
+
 				var right = this.eval(node.right)
 				if (this.isError(right)) {
 					return right
@@ -414,6 +457,9 @@ class MonkeyEvaluator {
 				console.log("eval prefix expression: ", obj.inspect())
 				return obj
 			case "InfixExpression":
+				// change
+				this.pauseBeforeExec(node)
+
 				var left = this.eval(node.left)
 				if (this.isError(left)) {
 					return left
@@ -424,10 +470,15 @@ class MonkeyEvaluator {
 				}
 				return this.evalInfixExpression(node.operator, left, right)
 			case "IfExpression":
+				// change
+				this.pauseBeforeExec(node)
+
 				return this.evalIfExpression(node)
 			case "blockStatement":
 				return this.evalStatements(node)
 			case "ReturnStatement":
+				// change
+				this.pauseBeforeExec(node)
 				var props = {}
 				props.value = this.eval(node.expression)
 				if (this.isError(props.value)) {
@@ -443,7 +494,6 @@ class MonkeyEvaluator {
 		return null
 	}
 
-	// change 4
 	evalHashLiteral(node) {
 		/*
 		先递归的解析哈希表的key，然后解析它的value,对于如下类型的哈希表代码
@@ -496,13 +546,11 @@ class MonkeyEvaluator {
 			index.type() === index.INTEGER_OBJ) {
 			return this.evalArrayIndexExpression(left, index)
 		}
-		// change 4
 		if (left.type() == left.HASH_OBJ) {
 			return this.evalHashIndexExpression(left, index)
 		}
 	}
 
-	//change 5
 	evalHashIndexExpression(hash, index) {
 		if (!this.hashable(index)) {
 			return new this.Error("unhashable type: " + index.type())
@@ -555,20 +603,28 @@ class MonkeyEvaluator {
 		var result = null
 		for (var i = 0; i < program.statements.length; i++) {
 			result = this.eval(program.statements[i])
+			// change 4
+			var props = this.setExecInfo()
 			if (result.type() === result.RETURN_VALUE_OBJECT) {
+				this.evalWorker.sendExecInfo("finishExec", props)
 				return result.valueObject
 			}
 
 			if (result.type() === result.NULL_OBJ) {
+				this.evalWorker.sendExecInfo("finishExec", props)
 				return result
 			}
 
 			if (result.type === result.ERROR_OBJ) {
+				this.evalWorker.sendExecInfo("finishExec", props)
 				console.log(result.msg)
 				return result
 			}
 		}
 
+		//change 5
+		var props = this.setExecInfo()
+		this.evalWorker.sendExecInfo("finishExec", props)
 		return result
 	}
 
@@ -786,4 +842,6 @@ class MonkeyEvaluator {
 
 }
 
-export default MonkeyEvaluator
+export default MonkeyEvaluator;
+
+
