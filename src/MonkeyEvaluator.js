@@ -97,7 +97,7 @@ class Integer extends BaseObject {
 	}
 }
 
-class Boolean extends BaseObject {
+class BooleanCtr extends BaseObject {
 	constructor (props) {
 		super(props)
 		this.value = props.value
@@ -296,7 +296,7 @@ class MonkeyEvaluator {
 	}
 
 	eval (node) {
-		var props = {}
+		const props = {}
 		switch (node.type) {
 			case "program":
 				return this.evalProgram(node)
@@ -304,23 +304,22 @@ class MonkeyEvaluator {
 			case "HashLiteral":
 				return this.evalHashLiteral(node)
 			case "ArrayLiteral":
-				var elements = this.evalExpressions(node.elements)
+				const elements = this.evalExpressions(node.elements)
 				if (elements.length === 1 && this.isError(elements[0])) {
 					return elements[0]
 				}
-				var props = {}
 				props.elements = elements
 				return new Array(props)
 			case "IndexExpression":
-				var left = this.eval(node.left)
+				const left = this.eval(node.left)
 				if (this.isError(left)) {
 					return left
 				}
-				var index = this.eval(node.index)
+				const index = this.eval(node.index)
 				if (this.isError(index)) {
 					return index
 				}
-				var obj = this.evalIndexExpression(left, index)
+				const obj = this.evalIndexExpression(left, index)
 				if (obj != null) {
 					console.log("the index value is :"+index.value+" with content : "
 						+ obj.inspect())
@@ -344,7 +343,7 @@ class MonkeyEvaluator {
 				console.log("it is binding value is " + value.inspect())
 				return value
 			case "FunctionLiteral":
-				var props = {}
+
 				props.token = node.token
 				props.identifiers = node.parameters
 				props.blockStatement = node.body
@@ -399,11 +398,11 @@ class MonkeyEvaluator {
 			case "Boolean":
 				props.value = node.value
 				console.log("Boolean with value:", node.value)
-				return new Boolean(props)
+				return new BooleanCtr(props)
 			case "ExpressionStatement":
 				return this.eval(node.expression)
 			case "PrefixExpression":
-				var right = this.eval(node.right)
+				const right = this.eval(node.right)
 				if (this.isError(right)) {
 					return right
 				}
@@ -426,7 +425,7 @@ class MonkeyEvaluator {
 			case "blockStatement":
 				return this.evalStatements(node)
 			case "ReturnStatement":
-				var props = {}
+
 				props.value = this.eval(node.expression)
 				if (this.isError(props.value)) {
 					return props.value
@@ -659,12 +658,12 @@ class MonkeyEvaluator {
 			props.value = (left.vaule == right.value)
 			console.log("result on boolean operation of " + operator
 				+ " is " + props.value)
-			return new Boolean(props)
+			return new BooleanCtr(props)
 		} else if (operator == '!=') {
 			props.value = (left.value != right.value)
 			console.log("result on boolean operation of " + operator
 				+ " is " + props.value)
-			return new Boolean(props)
+			return new BooleanCtr(props)
 		}
 
 		return  this.newError("unknown operator: "+ operator)
@@ -675,9 +674,9 @@ class MonkeyEvaluator {
 			return this.newError("unknown operator for string operation")
 		}
 
-		var leftVal = left.value
-		var rightVal = right.value
-		var props = {}
+		const leftVal = left.value
+		const rightVal = right.value
+		const props = {}
 		props.value = leftVal + rightVal
 		console.log("reuslt of string add is: ", props.value)
 		return new String(props)
@@ -727,7 +726,7 @@ class MonkeyEvaluator {
 		if (resultType === "integer") {
 			result = new Integer(props)
 		} else if (resultType === "boolean") {
-			result = new Boolean(props)
+			result = new BooleanCtr(props)
 		}
 
 		return result
@@ -768,7 +767,7 @@ class MonkeyEvaluator {
 			props.value = true
 		}
 
-		return new Boolean(props)
+		return new BooleanCtr(props)
 	}
 
 	evalMinusPrefixOperatorExpression(right) {
