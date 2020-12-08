@@ -2,6 +2,8 @@ import React , {Component} from 'react'
 import * as bootstrap from 'react-bootstrap'
 import MonkeyLexer from './MonkeyLexer'
 import MonkeyCompilerEditer from './MonkeyCompilerEditer'
+import MonkeyCompilerParser from './MonkeyCompilerParser' //引入只是为了sourcemap
+import MonkeyEvaluator from './MonkeyEvaluator'
 import Worker from './channel.worker'
 
 class MonkeyCompilerIDE extends Component {
@@ -9,9 +11,10 @@ class MonkeyCompilerIDE extends Component {
     constructor(props) {
         super(props)
         this.lexer = new MonkeyLexer("")
-        this.state = {stepEnable: false}
-        this.breakPointMap = null
-        this.channelWorker = new Worker()
+        this.evaluator = new MonkeyEvaluator()
+        // this.state = {stepEnable: false}
+        // this.breakPointMap = null
+        // this.channelWorker = new Worker()
     }
 
     updateBreakPointMap(bpMap) {
@@ -19,10 +22,15 @@ class MonkeyCompilerIDE extends Component {
     }
 
     onLexingClick () { 
-      this.inputInstance.setIDE(this)
-      this.channelWorker.postMessage(['code', this.inputInstance.getContent()])
-       this.channelWorker.addEventListener('message', 
-        this.handleMsgFromChannel.bind(this))
+        // this.inputInstance.setIDE(this)
+        // this.channelWorker.postMessage(['code', this.inputInstance.getContent()])
+        // this.channelWorker.addEventListener('message',
+        // this.handleMsgFromChannel.bind(this))
+        this.lexer = new MonkeyLexer(this.inputInstance.getContent())
+        this.parser = new MonkeyCompilerParser(this.lexer)
+        this.parser.parseProgram()
+        this.program = this.parser.program
+        this.evaluator.eval(this.program)
    } 
 
    handleMsgFromChannel(e) {
@@ -44,7 +52,6 @@ class MonkeyCompilerIDE extends Component {
      }
    }
 
-   //change 3
    getSymbolInfo(name) {
      return this.currentEnviroment[name]
    }
@@ -66,18 +73,14 @@ class MonkeyCompilerIDE extends Component {
             <MonkeyCompilerEditer 
              ref={(ref) => {this.inputInstance = ref;}}
              keyWords={this.lexer.getKeyWords()}
-             evaluator = {this.evaluator}/>
+             //evaluator = {this.evaluator}
+            />
             <bootstrap.Button onClick={this.onLexingClick.bind(this)} 
              style={{marginTop: '16px'}}
              bsStyle="danger">
               Parsing
             </bootstrap.Button>
-            <bootstrap.Button onClick={this.onContinueClick.bind(this)} 
-             style={{marginTop: '16px'}}
-             disabled = {!this.state.stepEnable}
-             bsStyle="danger">
-              Step
-            </bootstrap.Button>
+
           </bootstrap.Panel>
           );
     }

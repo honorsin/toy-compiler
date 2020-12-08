@@ -4,7 +4,7 @@ self.addEventListener("message", handleMessage);
 
 function handleMessage(event) {
 	console.log("channel worker receive msg :" , event.data[0])
-  var cmd = event.data
+  let cmd = event.data
   if (Array.isArray(event.data)) {
     cmd = event.data[0]
   }
@@ -36,7 +36,7 @@ function handleMessage(event) {
     return
     case 'execNext':
     console.log("channel worker receive msg execNext ")
-    var int32 = new Int32Array(this.sharedMem)
+    const int32 = new Int32Array(this.sharedMem)
     Atomics.store(int32, 0, 123)
     Atomics.notify(int32, 0, 1)
     return

@@ -5,12 +5,14 @@ import MonkeyCompilerParser from './MonkeyCompilerParser'
 self.addEventListener("message", handleMessage);
 
 function handleMessage(event) {
-	console.log("evaluaotr begin to eval")
+	console.log("evaluator begin to eval")
     this.sharedArray = new Int32Array(event.data[0])
     this.execCommand = 123
-
+    //初始化词法解析器
     this.lexer = new MonkeyLexer(event.data[1])
+    //初始化语法解析器
     this.parser = new MonkeyCompilerParser(this.lexer)
+    //开始语法解析
     this.program = this.parser.parseProgram()
     var props = {}
     this.evaluator = new MonkeyEvaluator(this)

@@ -6,6 +6,15 @@ import * as bootstrap from "react-bootstrap";
 class MonkeyCompilerEditer extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      popoverStyle:{
+        placement: "right",
+        positionLeft: -100,
+        positionTop: -100,
+        title: "",
+        content: ""
+      }
+    }
     this.keyWords = props.keyWords;
     rangy.init();
     this.keyWordClass = "keyword";
@@ -16,8 +25,8 @@ class MonkeyCompilerEditer extends Component {
     this.lineSpanNode = "LineSpan";
     this.identifierClass = "Identifier";
     this.breakPointClass = "breakpoint";
-    this.spanToTokenMap = {};
-    this.initPopoverControl();
+    //this.spanToTokenMap = {};
+
     this.keyToIngore = [
       "Enter",
       " ",
@@ -26,9 +35,8 @@ class MonkeyCompilerEditer extends Component {
       "ArrowLeft",
       "ArrowRight",
     ];
-    // change 1
-    var ruleClass1 = "span." + this.lineSpanNode + ":before";
-    var rule =
+    const ruleClass1 = "span." + this.lineSpanNode + ":before";
+    let rule =
       "counter-increment: line;content: counter(line);display: inline-block;";
     rule += "border-right: 1px solid #ddd;padding: 0 .5em;";
     rule += "margin-right: .5em;color: #666;";
@@ -38,9 +46,12 @@ class MonkeyCompilerEditer extends Component {
     this.bpMap = {};
     this.ide = null;
   }
+  componentDidMount() {
+    this.initPopoverControl();
+  }
 
   initPopoverControl() {
-    this.state = {
+    this.setState({
       popoverStyle: {
         placement: "right",
         positionLeft: -100,
@@ -48,7 +59,7 @@ class MonkeyCompilerEditer extends Component {
         title: "",
         content: ""
       }
-    };
+    })
   }
 
   getContent() {
@@ -56,15 +67,17 @@ class MonkeyCompilerEditer extends Component {
   }
   // dom树，找到节点，提供给lexer进行分词
   changeNode(n) {
-    var f = n.childNodes;
-    for (const node of f) {
-      this.changeNode(node);
+    if (n.childNodes){
+      const f = n.childNodes;
+      for (const node of f) {
+        this.changeNode(node);
+      }
     }
     if (n.data) {
       this.lastBegin = 0;
       n.keyWordCount = 0;
       n.identifierCount = 0;
-      var lexer = new MonkeyLexer(n.data);
+      const lexer = new MonkeyLexer(n.data);
       this.lexer = lexer;
       lexer.setLexingObserver(this, n);
       lexer.lexing();
@@ -72,7 +85,7 @@ class MonkeyCompilerEditer extends Component {
   }
   // 观察者模式  回调获得token对象，以及初始及结束位置
   notifyTokenCreation(token, elementNode, begin, end) {
-    var e = {};
+    const e = {};
     e.node = elementNode;
     e.begin = begin;
     e.end = end;
@@ -93,19 +106,19 @@ class MonkeyCompilerEditer extends Component {
   }
 
   hightLightKeyWord(token, elementNode, begin, end) {
-    var strBefore = elementNode.data.substr(
+    let strBefore = elementNode.data.substr(
       this.lastBegin,
       begin - this.lastBegin
     );
     //空格转换为unicode
     strBefore = this.changeSpaceToNBSP(strBefore);
 
-    var textNode = document.createTextNode(strBefore);
-    var parentNode = elementNode.parentNode;
+    const textNode = document.createTextNode(strBefore);
+    const parentNode = elementNode.parentNode;
     parentNode.insertBefore(textNode, elementNode);
     this.textNodeArray.push(textNode);
-
-    var span = document.createElement("span");
+    //  关键词设置一个span标签
+    const span = document.createElement("span");
     span.style.color = "green";
     span.classList.add(this.keyWordClass);
     span.appendChild(document.createTextNode(token.getLiteral()));
@@ -118,8 +131,8 @@ class MonkeyCompilerEditer extends Component {
 
   changeSpaceToNBSP(str) {
     //空格转换成UNICODE空格编码'\u00a0'，用以保留空格
-    var s = "";
-    for (var i = 0; i < str.length; i++) {
+    let s = "";
+    for (let i = 0; i < str.length; i++) {
       if (str[i] === " ") {
         s += "\u00a0";
       } else {
@@ -131,20 +144,20 @@ class MonkeyCompilerEditer extends Component {
   }
 
   hightLightSyntax() {
-    var i;
+
     this.textNodeArray = [];
 
-    for (i = 0; i < this.keyWordElementArray.length; i++) {
-      var e = this.keyWordElementArray[i];
+    for ( let i = 0; i < this.keyWordElementArray.length; i++) {
+      const e = this.keyWordElementArray[i];
       this.currentElement = e.node;
       this.hightLightKeyWord(e.token, e.node, e.begin, e.end);
 
       if (this.currentElement.keyWordCount === 0) {
-        var end = this.currentElement.data.length;
-        var lastText = this.currentElement.data.substr(this.lastBegin, end);
+        const end = this.currentElement.data.length;
+        let lastText = this.currentElement.data.substr(this.lastBegin, end);
         lastText = this.changeSpaceToNBSP(lastText);
-        var parent = this.currentElement.parentNode;
-        var lastNode = document.createTextNode(lastText);
+        const parent = this.currentElement.parentNode;
+        const lastNode = document.createTextNode(lastText);
         parent.insertBefore(lastNode, this.currentElement);
         // 解析最后一个节点，这样可以为关键字后面的变量字符串设立popover控件
         this.textNodeArray.push(lastNode);
@@ -155,59 +168,59 @@ class MonkeyCompilerEditer extends Component {
   }
 
   getCaretLineNode() {
-    var sel = document.getSelection();
+    const sel = document.getSelection();
     //得到光标所在行的node对象
-    var nd = sel.anchorNode;
+    const nd = sel.anchorNode;
     //查看其父节点是否是span,如果不是，
     //我们插入一个span节点用来表示光标所在的行
-    var currentLineSpan = null;
-    var elements = document.getElementsByClassName(this.lineSpanNode);
-    for (var i = 0; i < elements.length; i++) {
-      var element = elements[i];
+    let currentLineSpan = null;
+    const elements = document.getElementsByClassName(this.lineSpanNode);
+    for (let i = 0; i < elements.length; i++) {
+      const element = elements[i];
       if (element.contains(nd)) {
         currentLineSpan = element;
       }
+      //删除自动复制的span class属性
       while (element.classList.length > 0) {
         element.classList.remove(element.classList.item(0));
       }
       element.classList.add(this.lineSpanNode);
-      element.classList.add(this.lineNodeClass + i);
+      element.classList.add(this.lineNodeClass + String(i));
     }
 
     if (currentLineSpan !== null) {
-      // change 2
-      currentLineSpan.onclick = function (e) {
+
+      currentLineSpan.onclick = (e) => {
         this.createBreakPoint(e.toElement);
-      }.bind(this);
+      }
       return currentLineSpan;
     }
 
     //计算一下当前光标所在节点的前面有多少个div节点，
     //前面的div节点数就是光标所在节点的行数
-    var divElements = this.divInstance.childNodes;
-    var l = 0;
-    for (i = 0; i < divElements.length; i++) {
+    const divElements = this.divInstance.childNodes;
+    let l = 0;
+    for (let i = 0; i < divElements.length; i++) {
       if (divElements[i].tagName === "DIV" && divElements[i].contains(nd)) {
         l = i;
         break;
       }
     }
 
-    var spanNode = document.createElement("span");
+    const spanNode = document.createElement("span");
     spanNode.classList.add(this.lineSpanNode);
-    spanNode.classList.add(this.lineNodeClass + l);
-    // change 3
-    spanNode.dataset.lineNum = l;
+    spanNode.classList.add(this.lineNodeClass + String(l));
+    spanNode.dataset.lineNum = String(l);
 
-    spanNode.onclick = function (e) {
+    spanNode.onclick =  (e) => {
       this.createBreakPoint(e.toElement);
-    }.bind(this);
+    };
 
     nd.parentNode.replaceChild(spanNode, nd);
     spanNode.appendChild(nd);
     return spanNode;
   }
-  // change 3
+
   setIDE(ide) {
     this.ide = ide;
   }
@@ -229,7 +242,7 @@ class MonkeyCompilerEditer extends Component {
     }
 
     //构造一个红色圆点
-    elem.dataset.bp = true;
+    elem.dataset.bp = "true";
     this.bpMap["" + elem.dataset.lineNum] = elem.dataset.lineNum;
     const bp = document.createElement("span");
     bp.style.height = "10px";
@@ -255,13 +268,16 @@ class MonkeyCompilerEditer extends Component {
         content:  "name:" + token.getLiteral() + "\nType:" + token.getType()
       }
     })
-
-    // change
     if (this.ide) {
       const env = this.ide.getSymbolInfo(token.getLiteral());
       if (env) {
-        this.state.popoverStyle.title = token.getLiteral();
-        this.state.popoverStyle.content = env;
+      this.setState({
+          popoverStyle:{
+            positionLeft:e.clientX + 5,
+            positionTop:e.currentTarget.offsetTop - e.currentTarget.offsetHeight,
+            title: token.getLiteral(),
+            content: env
+          }})
       }
     }
 
@@ -273,16 +289,16 @@ class MonkeyCompilerEditer extends Component {
   }
 
   addPopoverSpanToIdentifier(token, elementNode, begin, end) {
-    var strBefore = elementNode.data.substr(
+    let strBefore = elementNode.data.substr(
       this.lastBegin,
       begin - this.lastBegin
     );
     strBefore = this.changeSpaceToNBSP(strBefore);
-    var textNode = document.createTextNode(strBefore);
-    var parentNode = elementNode.parentNode;
+    const textNode = document.createTextNode(strBefore);
+    const parentNode = elementNode.parentNode;
     parentNode.insertBefore(textNode, elementNode);
 
-    var span = document.createElement("span");
+    const span = document.createElement("span");
     span.onmouseenter = this.handleIdentifierOnMouseOver.bind(this);
     span.onmouseleave = this.handleIdentifierOnMouseOut.bind(this);
     span.classList.add(this.identifierClass);
@@ -295,19 +311,19 @@ class MonkeyCompilerEditer extends Component {
 
   addPopoverByIdentifierArray() {
     //该函数的逻辑跟hightLightSyntax一摸一样
-    for (var i = 0; i < this.identifierElementArray.length; i++) {
+    for (let i = 0; i < this.identifierElementArray.length; i++) {
       //用 span 将每一个变量包裹起来，这样鼠标挪上去时就可以弹出popover控件
-      var e = this.identifierElementArray[i];
+      const e = this.identifierElementArray[i];
       this.currentElement = e.node;
       //找到每个IDENTIFIER类型字符串的起始和末尾，给他们添加span标签
       this.addPopoverSpanToIdentifier(e.token, e.node, e.begin, e.end);
 
       if (this.currentElement.identifierCount === 0) {
-        var end = this.currentElement.data.length;
-        var lastText = this.currentElement.data.substr(this.lastBegin, end);
+        const end = this.currentElement.data.length;
+        let lastText = this.currentElement.data.substr(this.lastBegin, end);
         lastText = this.changeSpaceToNBSP(lastText);
-        var parent = this.currentElement.parentNode;
-        var lastNode = document.createTextNode(lastText);
+        const parent = this.currentElement.parentNode;
+        const lastNode = document.createTextNode(lastText);
         parent.insertBefore(lastNode, this.currentElement);
         parent.removeChild(this.currentElement);
       }
@@ -320,26 +336,25 @@ class MonkeyCompilerEditer extends Component {
     if (this.textNodeArray.length > 0) {
       //fix bug
       this.identifierElementArray = [];
-      for (var i = 0; i < this.textNodeArray.length; i++) {
+      for (let i = 0; i < this.textNodeArray.length; i++) {
         //将text 节点中的文本提交给词法解析器抽取IDENTIFIER
         this.changeNode(this.textNodeArray[i]);
-        //为解析出的IDENTIFIER字符串添加鼠标取词功能
-        this.addPopoverByIdentifierArray();
       }
       this.textNodeArray = [];
-    } else {
-      this.addPopoverByIdentifierArray();
     }
+    //为解析出的IDENTIFIER字符串添加鼠标取词功能
+      this.addPopoverByIdentifierArray();
+
   }
 
   hightlineByLine(line, hightLine) {
-    var lineClass = this.lineNodeClass + line;
-    var spans = document.getElementsByClassName(lineClass);
-    // change 4
+    const lineClass = this.lineNodeClass + line;
+    const spans = document.getElementsByClassName(lineClass);
+
     if (spans !== null && hightLine === true) {
-      var span = spans[0];
+      const span = spans[0];
       span.style.backgroundColor = "blue";
-      var arrow = document.createElement("span");
+      const arrow = document.createElement("span");
       arrow.classList.add("glyphicon");
       arrow.classList.add("glyphicon-circle-arrow-right");
       arrow.classList.add("ArrowRight");
@@ -356,12 +371,12 @@ class MonkeyCompilerEditer extends Component {
     }
   }
 
-  onDivContentChane(evt) {
+   onDivContentChange = (evt) => {
     if (this.keyToIngore.indexOf(evt.key) >= 0) {
       return;
     }
 
-    var bookmark = undefined;
+    let bookmark = undefined;
     if (evt.key !== "Enter") {
       //使用rangy组件确认光标能回到原来的位置
       bookmark = rangy.getSelection().getBookmark(this.divInstance);
@@ -374,8 +389,8 @@ class MonkeyCompilerEditer extends Component {
         currentLine.childNodes[i].className === this.keyWordClass ||
         currentLine.childNodes[i].className === this.identifierClass
       ) {
-        var child = currentLine.childNodes[i];
-        var t = document.createTextNode(child.innerText);
+        const child = currentLine.childNodes[i];
+        const t = document.createTextNode(child.innerText);
         currentLine.replaceChild(t, child);
       }
     }
@@ -398,23 +413,23 @@ class MonkeyCompilerEditer extends Component {
         数字处点击的信息，但是设置后mouseenter消息就不能接收到
         于是当我们把鼠标挪到变量上方时，无法显现popover
         */
-    var lineSpans = document.getElementsByClassName(this.lineSpanNode);
-    for (var i = 0; i < lineSpans.length; i++) {
+    const lineSpans = document.getElementsByClassName(this.lineSpanNode);
+    for (let i = 0; i < lineSpans.length; i++) {
       lineSpans[i].style.pointerEvents = "none";
     }
   }
-
-  onMouseEnter() {
-    /*
-        要想让popover控件出现，必须接收mouseenter时间，
-        只有把pointerEvent设置为空而不是none时，这个时间才能传递给
-        span
-        */
-    const lineSpans = document.getElementsByClassName(this.lineSpanNode);
-    for (let i = 0; i < lineSpans.length; i++) {
-      lineSpans[i].style.pointerEvents = "";
-    }
-  }
+  //
+  // onMouseEnter() {
+  //   /*
+  //       要想让popover控件出现，必须接收mouseenter时间，
+  //       只有把pointerEvent设置为空而不是none时，这个时间才能传递给
+  //       span
+  //       */
+  //   const lineSpans = document.getElementsByClassName(this.lineSpanNode);
+  //   for (let i = 0; i < lineSpans.length; i++) {
+  //     lineSpans[i].style.pointerEvents = "";
+  //   }
+  // }
 
   render() {
     let textAreaStyle = {
@@ -427,12 +442,13 @@ class MonkeyCompilerEditer extends Component {
       <div>
         <div
           style={textAreaStyle}
-          onKeyUp={this.onDivContentChane.bind(this)}
+          onKeyUp={this.onDivContentChange}
           ref={(ref) => {
             this.divInstance = ref;
           }}
           contentEditable
-        ></div>
+        >
+        </div>
 
         <bootstrap.Popover
           placement={this.state.popoverStyle.placement}

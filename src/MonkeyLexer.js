@@ -173,7 +173,7 @@ class MonkeyLexer {
 
 	peekChar () {
 	     if (this.readPosition >= this.sourceCode.length) {
-        	return 0
+        	return false
         } else {
         	return this.sourceCode[this.readPosition]
         }
