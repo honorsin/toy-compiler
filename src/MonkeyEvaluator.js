@@ -1,7 +1,7 @@
 
 
 class BaseObject {
-	constructor (props) {
+	constructor () {
 		this.INTEGER_OBJ = "INTEGER"
 		this.BOOLEAN_OBJ = "BOOLEAN"
 		this.NULL_OBJ = "NULL"
@@ -11,7 +11,6 @@ class BaseObject {
 		this.FUNCTION_CALL = "FunctionCall"
 		this.STRING_OBJ = "String"
 		this.ARRAY_OBJ = "Array"
-		// change 1
 		this.HASH_OBJ = "Hash"
 	}
 
@@ -20,7 +19,6 @@ class BaseObject {
 	inspect() {return null}
 }
 
-// change 2
 class Hash extends BaseObject {
 	constructor(props) {
 		super(props)
@@ -33,8 +31,8 @@ class Hash extends BaseObject {
 	}
 
 	inspect () {
-		var s = "{"
-		for (var i = 0; i < this.keys.length; i++) {
+		let s = "{"
+		for (let i = 0; i < this.keys.length; i++) {
 			var pair = "" + this.keys[i].inspect()
 			pair += ":"
 			pair += this.values[i].inspect()
@@ -228,6 +226,7 @@ class MonkeyEvaluator {
 
 	builtins (name, args) {
 		//实现内嵌API
+		const props = {}
 		switch (name) {
 			case "first":
 				if (args.length != 1) {
@@ -250,7 +249,6 @@ class MonkeyEvaluator {
 					return this.newError("arguments of first must be ARRAY")
 				}
 				if (args[0].elements.length > 1) {
-					var props = {}
 					//去掉第一个元素
 					props.elements = args[0].elements.slice(1)
 					var obj = new Array(props)
@@ -266,7 +264,7 @@ class MonkeyEvaluator {
 					return this.newError("arguments of first must be ARRAY")
 				}
 
-				var props = {}
+
 				props.elements = args[0].elements.slice(0)
 				props.elements.push(args[1])
 				var obj = new Array(props)
@@ -280,13 +278,13 @@ class MonkeyEvaluator {
 				}
 				switch (args[0].type()) {
 					case args[0].STRING_OBJ:
-						var props = {}
+
 						props.value = args[0].value.length
 						var obj = new Integer(props)
 						console.log("API len return: ",obj.inspect())
 						return obj
 					case args[0].ARRAY_OBJ:
-						var props = {}
+
 						props.value = args[0].elements.length
 						console.log("len of array " + args[0].inspect() + " is " +
 							props.value)
