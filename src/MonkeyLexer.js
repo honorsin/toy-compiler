@@ -140,14 +140,14 @@ class MonkeyLexer {
 
 	initKeywords() {
 		this.keyWordMap = [];
-		this.keyWordMap["let"] = new Token(this.LET, "let", 1)
-		this.keyWordMap["if"] = new Token(this.IF, "if", 1)
-		this.keyWordMap["else"] = new Token(this.ELSE, "else", 1)
+		this.keyWordMap["let"] = new Token(this.LET, "let", 0)
+		this.keyWordMap["if"] = new Token(this.IF, "if", 0)
+		this.keyWordMap["else"] = new Token(this.ELSE, "else", 0)
 
-		this.keyWordMap["fn"] = new Token(this.FUNCTION, "fn", 1)
-		this.keyWordMap["true"] = new Token(this.TRUE, "true", 1)
-		this.keyWordMap["false"] = new Token(this.FALSE, "false", 1)
-		this.keyWordMap["return"] = new Token(this.RETURN, "return", 1)
+		this.keyWordMap["fn"] = new Token(this.FUNCTION, "fn", 0)
+		this.keyWordMap["true"] = new Token(this.TRUE, "true", 0)
+		this.keyWordMap["false"] = new Token(this.FALSE, "false", 0)
+		this.keyWordMap["return"] = new Token(this.RETURN, "return", 0)
 	}
 
 	setLexingObserver(o, context) {

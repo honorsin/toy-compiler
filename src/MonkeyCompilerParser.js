@@ -311,7 +311,6 @@ class Program {
     }
 }
 
-// change 1 
 class PopStackStatement extends Statement {
     constructor(props) {
     super(props)
@@ -713,7 +712,7 @@ class MonkeyCompilerParser {
       exprProps.token = this.curToken;
       this.nextToken()
       props.expression = this.parseExpression(this.LOWEST)
-
+        //  结尾必须是分号
       if (!this.expectPeek(this.lexer.SEMICOLON)) {
            return null
        }

@@ -339,12 +339,13 @@ class MonkeyCompilerEditer extends Component {
       for (let i = 0; i < this.textNodeArray.length; i++) {
         //将text 节点中的文本提交给词法解析器抽取IDENTIFIER
         this.changeNode(this.textNodeArray[i]);
+        this.addPopoverByIdentifierArray();
       }
       this.textNodeArray = [];
-    }
-    //为解析出的IDENTIFIER字符串添加鼠标取词功能
+    } else {
+      //为解析出的IDENTIFIER字符串添加鼠标取词功能
       this.addPopoverByIdentifierArray();
-
+    }
   }
 
   hightlineByLine(line, hightLine) {
@@ -418,7 +419,7 @@ class MonkeyCompilerEditer extends Component {
       lineSpans[i].style.pointerEvents = "none";
     }
   }
-  //
+
   // onMouseEnter() {
   //   /*
   //       要想让popover控件出现，必须接收mouseenter时间，

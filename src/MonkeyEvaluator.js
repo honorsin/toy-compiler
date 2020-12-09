@@ -170,9 +170,9 @@ class FunctionLiteral extends BaseObject {
 	}
 
 	inspect() {
-		var s = "fn("
-		var identifiers = []
-		for (var i = 0; i < this.paremeters.length; i++) {
+		let s = "fn("
+		const identifiers = []
+		for (let i = 0; i < this.paremeters.length; i++) {
 			identifiers[i] = this.parameters[i].tokenLiteral
 		}
 		s += identifiers.join(',')
@@ -251,7 +251,7 @@ class MonkeyEvaluator {
 				if (args[0].elements.length > 1) {
 					//去掉第一个元素
 					props.elements = args[0].elements.slice(1)
-					var obj = new Array(props)
+					const obj = new Array(props)
 					console.log("rest return: ", obj.inspect())
 					return obj
 				}
@@ -267,7 +267,7 @@ class MonkeyEvaluator {
 
 				props.elements = args[0].elements.slice(0)
 				props.elements.push(args[1])
-				var obj = new Array(props)
+				const obj = new Array(props)
 				console.log("new array after calling append is: ",
 					obj.inspect())
 				return obj
@@ -280,7 +280,7 @@ class MonkeyEvaluator {
 					case args[0].STRING_OBJ:
 
 						props.value = args[0].value.length
-						var obj = new Integer(props)
+						const obj = new Integer(props)
 						console.log("API len return: ",obj.inspect())
 						return obj
 					case args[0].ARRAY_OBJ:
@@ -300,7 +300,6 @@ class MonkeyEvaluator {
 		switch (node.type) {
 			case "program":
 				return this.evalProgram(node)
-			//change 3
 			case "HashLiteral":
 				return this.evalHashLiteral(node)
 			case "ArrayLiteral":
@@ -311,7 +310,7 @@ class MonkeyEvaluator {
 				props.elements = elements
 				return new Array(props)
 			case "IndexExpression":
-				const left = this.eval(node.left)
+				var left = this.eval(node.left)
 				if (this.isError(left)) {
 					return left
 				}
@@ -330,24 +329,24 @@ class MonkeyEvaluator {
 				return new String(props)
 
 			case "LetStatement":
-				var val = this.eval(node.value)
-				if (this.isError(val)) {
-					return val
+				const letVal = this.eval(node.value)
+				if (this.isError(letVal)) {
+					return letVal
 				}
 
-				this.enviroment.set(node.name.tokenLiteral, val)
-				return val
+				this.enviroment.set(node.name.tokenLiteral, letVal)
+				return letVal
 			case "Identifier":
 				console.log("variable name is:" + node.tokenLiteral)
-				var value = this.evalIdentifier(node, this.enviroment)
-				console.log("it is binding value is " + value.inspect())
-				return value
+				const identifierValue = this.evalIdentifier(node, this.enviroment)
+				console.log("it is binding value is " + identifierValue.inspect())
+				return identifierValue
 			case "FunctionLiteral":
 
 				props.token = node.token
 				props.identifiers = node.parameters
 				props.blockStatement = node.body
-				var funObj = new FunctionCall(props)
+				const funObj = new FunctionCall(props)
 				funObj.enviroment  = this.newEnclosedEnvironment(this.enviroment)
 				return  funObj
 			case "CallExpression":
@@ -402,7 +401,7 @@ class MonkeyEvaluator {
 			case "ExpressionStatement":
 				return this.eval(node.expression)
 			case "PrefixExpression":
-				const right = this.eval(node.right)
+				var right = this.eval(node.right)
 				if (this.isError(right)) {
 					return right
 				}
@@ -540,7 +539,7 @@ class MonkeyEvaluator {
 	}
 
 	evalIdentifier(node, env) {
-		var val = env.get(node.tokenLiteral)
+		const val = env.get(node.tokenLiteral)
 		if (val === undefined) {
 			return this.newError("identifier no found:"+node.name)
 		}
@@ -549,8 +548,8 @@ class MonkeyEvaluator {
 	}
 
 	evalProgram (program) {
-		var result = null
-		for (var i = 0; i < program.statements.length; i++) {
+		let result = null
+		for (let i = 0; i < program.statements.length; i++) {
 			result = this.eval(program.statements[i])
 			if (result.type() === result.RETURN_VALUE_OBJECT) {
 				return result.valueObject
@@ -578,7 +577,7 @@ class MonkeyEvaluator {
 	}
 
 	newError(msg) {
-		var props = {}
+		const props = {}
 		props.errMsg = msg
 		return new Error(props)
 	}
@@ -626,8 +625,8 @@ class MonkeyEvaluator {
 		var result = null
 		for (var i = 0; i < node.statements.length; i++) {
 			result = this.eval(node.statements[i])
-			if (result.type() == result.RETURN_VALUE_OBJECT
-				|| result.type() == result.ERROR_OBJ) {
+			if (result.type() === result.RETURN_VALUE_OBJECT
+				|| result.type() === result.ERROR_OBJ) {
 				return result
 			}
 		}
@@ -636,7 +635,7 @@ class MonkeyEvaluator {
 	}
 
 	evalInfixExpression(operator, left, right) {
-		if (left.type() != right.type()) {
+		if (left.type() !== right.type()) {
 			return  this.newError("type mismatch: " +
 				left.type() + " and " + right.type())
 		}
