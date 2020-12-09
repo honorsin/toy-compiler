@@ -2,7 +2,7 @@ import React , {Component} from 'react'
 import * as bootstrap from 'react-bootstrap'
 import MonkeyLexer from './MonkeyLexer'
 import MonkeyCompilerEditer from './MonkeyCompilerEditer'
-import MonkeyCompilerParser from './MonkeyCompilerParser'
+import MonkeyCompilerParser from './MonkeyCompilerParser' //不要删除，调试产生sourcemap
 import MonkeyEvaluator from './MonkeyEvaluator'
 import Worker from './channel.worker'
 
