@@ -68,12 +68,13 @@ class MonkeyLexer {
 	    this.RIGHT_PARENT = 24
 
 	    this.STRING = 25
-
+		//中括号
 	    this.LEFT_BRACKET = 26
 	    this.RIGHT_BRACKET = 27
-	    //change 4
+		//大括号
 	    this.LEFT_BRACE = 28
 	    this.RIGHT_BRACE = 29
+		//冒号
 	    this.COLON = 30
 	}
 
@@ -124,9 +125,9 @@ class MonkeyLexer {
 		    case this.RIGHT_BRACE:
 		      return "}"
 		    case this.EQ:
-		      return "=="
+		      return "==="
 		    case this.NOT_EQ:
-		      return "!="
+		      return "!=="
 		    case this.LEFT_PARENT:
 		      return "("
 		    case this.RIGHT_PARENT:
@@ -213,7 +214,9 @@ class MonkeyLexer {
 			case '=':
 			if (this.peekChar() === '=') {
 			    this.readChar()
-			    tok = new Token(this.EQ, "==", lineCount)
+				if (this.peekChar() === '=') {
+					tok = new Token(this.EQ, "===", lineCount)
+				}
 			} else {
 				tok = new Token(this.ASSIGN_SIGN, "=", lineCount)
 			}
@@ -233,7 +236,9 @@ class MonkeyLexer {
 			case '!':
 			if (this.peekChar() === '=') {
 			    this.readChar()
-			    tok = new Token(this.NOT_EQ, "!=", lineCount)
+				if (this.peekChar() === '=') {
+					tok = new Token(this.NOT_EQ, "!==", lineCount)
+				}
 			} else {
 				tok = new Token(this.BANG_SIGN, "!", lineCount)
 			}
@@ -265,7 +270,6 @@ class MonkeyLexer {
 			case ']':
 			tok = new Token(this.RIGHT_BRACKET, "]", lineCount)
 			break
-			// change 6
 			case '{':
 			tok = new Token(this.LEFT_BRACE, "{", lineCount)
 			break

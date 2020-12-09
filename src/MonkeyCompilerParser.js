@@ -5,7 +5,7 @@ class Node {
         this.type = ""
         this.lineNumber =  Number.MAX_SAFE_INTEGER
         for (const i in props) {
-          if (props[i].getLineNumber !== undefined) {
+          if (props[i]!= null && props[i].hasOwnProperty("getLineNumber" )) {
             console.log("line: " + props[i].getLineNumber())
             if (props[i].getLineNumber() < this.lineNumber) {
               this.lineNumber = props[i].getLineNumber()
@@ -14,13 +14,12 @@ class Node {
         }
     }
 
-    getLiteral() {
+     getLiteral() {
 	    return this.tokenLiteral
 	}
-
-  getLineNumber() {
+    getLineNumber() {
     return this.lineNumber
-  }
+    }
 }
 
 class Statement extends Node{ 
@@ -106,8 +105,7 @@ class InfixExpression extends Expression {
     this.left = props.leftExpression
     this.operator = props.operator
     this.right = props.rightExpression
-    this.tokenLiteral = "(" + this.left.getLiteral() + " " + this.operator
-        + this.right.getLiteral() + ")"
+    this.tokenLiteral = `(${this.left.getLiteral()} ${this.operator} ${this.right.getLiteral()})`
     this.type = "InfixExpression"
   }
 }
@@ -117,17 +115,17 @@ class IntegerLiteral extends Expression {
         super(props)
         this.token = props.token
         this.value = props.value
-        this.tokenLiteral = "Integer value is: " + this.token.getLiteral()
+        this.tokenLiteral = `Integer value is: ${this.token.getLiteral()}`
         this.type = "Integer"
     }
 }
 
-class Boolean extends Expression {
+class BooleanCtr extends Expression {
   constructor(props) {
     super(props)
     this.token = props.token
     this.value = props.value
-    this.tokenLiteral =  "Boolean token with value of " + this.value
+    this.tokenLiteral =  `Integer value is: ${this.value}`
     this.type = "Boolean"
   }
 }
@@ -139,15 +137,11 @@ class BlockStatement extends Statement {
     this.statements = props.statements
     let s = ""
     for (let i = 0; i < this.statements.length; i++) {
-      s += this.statements[i].getLiteral()
-      s += "\n"
+        s += `${this.statements[i].getLiteral()}\n`
     }
-
     this.tokenLiteral = s
-
     this.type = "blockStatement"
   }
-
 }
 
 class IfExpression extends Expression {
@@ -158,13 +152,12 @@ class IfExpression extends Expression {
     this.consequence = props.consequence
     this.alternative = props.alternative
 
-    let s = "if expression width condition: " +
-    this.condition.getLiteral()
-    s += "\n statements in if block are: "
-    s += this.consequence.getLiteral()
+    let s = `if expression width condition:
+    ${this.condition.getLiteral()}\n 
+    statements in if block are: 
+    ${this.consequence.getLiteral()}`
     if (this.alternative) {
-      s += "\n statements in else block are: "
-      s += this.alternative.getLiteral()
+      s += `\n statements in else block are: ${this.alternative.getLiteral()}`
     }
     this.tokenLiteral = s
 
@@ -179,19 +172,11 @@ class FunctionLiteral extends Expression {
     this.parameters = props.parameters
     this.body = props.body
 
-    let s = "It is a nameless function,"
-
-    s += "input parameters are: ("
+    let s = `It is a nameless function,input parameters are: (`
     for (let i = 0; i < this.parameters.length; i++) {
-      s += this.parameters[i].getLiteral()
-      s += "\n"
+      s += `${this.parameters[i].getLiteral()}\n`
     }
-    s += ")\n"
-
-    s += "statements in function body are : {"
-    s += this.body.getLiteral()
-    s += "}"
-
+    s += `)\n statements in function body are : { ${this.body.getLiteral()} }`
     this.tokenLiteral = s
 
     this.type = "FunctionLiteral"
@@ -214,7 +199,6 @@ class CallExpression extends Expression {
       s += this.arguments[i].getLiteral()
       s += ",\n"
     }
-
     s += ")"
     this.tokenLiteral = s
     this.type = "CallExpression"
@@ -237,7 +221,6 @@ class ArrayLiteral extends Expression {
     this.token = props.token 
     //elements 是Expression 对象列表
     this.elements = props.elements
-
     this.type = "ArrayLiteral"
   }
 
@@ -263,8 +246,7 @@ class IndexExpression extends Expression {
     this.left = props.left 
     //index可以是数字常量，变量，函数调用
     this.index = props.index 
-    this.tokenLiteral = "(["+this.left.getLiteral() + "]["
-      + this.index.getLiteral() + "])"
+    this.tokenLiteral = `([${this.left.getLiteral()}] [${this.index.getLiteral()}])`
     this.type = "IndexExpression"
   }
 }
@@ -282,14 +264,11 @@ class HashLiteral extends Expression {
   getLiteral() {
     let s = "{"
     for (let i = 0; i < this.keys.length; i++) {
-      s += this.keys[i].getLiteral();
-      s += ":"
-      s += this.values[i].getLiteral()
+      s += `${this.keys[i].getLiteral()}:${this.values[i].getLiteral()}`
       if (i < this.keys.length - 1) {
         s += ","
       }
     }
-
     s += "}"
     this.tokenLiteral = s
     return s 
@@ -311,18 +290,18 @@ class Program {
     }
 }
 
-class PopStackStatement extends Statement {
-    constructor(props) {
-    super(props)
-    this.token = props.token //identifier name
-    this.type = "PopStackStatement"
-  }
-
-  getLiteral() {
-    return "Asserting value from stack to identifier : " +
-    this.token 
-  }
-}
+// class PopStackStatement extends Statement {
+//     constructor(props) {
+//     super(props)
+//     this.token = props.token //identifier name
+//     this.type = "PopStackStatement"
+//   }
+//
+//   getLiteral() {
+//     return "Asserting value from stack to identifier : " +
+//     this.token
+//   }
+// }
 
 class MonkeyCompilerParser {
     constructor(lexer) {
@@ -360,7 +339,7 @@ class MonkeyCompilerParser {
         this.prefixParseFns[this.lexer.FUNCTION] = this.parseFunctionLiteral
 
         this.prefixParseFns[this.lexer.STRING] = this.parseStringLiteral
-
+        //数组解析
         this.prefixParseFns[this.lexer.LEFT_BRACKET] = this.parseArrayLiteral
 
         this.prefixParseFns[this.lexer.LEFT_BRACE] = this.parseHashLiteral
@@ -388,7 +367,6 @@ class MonkeyCompilerParser {
       if (p !== undefined) {
         return p
       }
-
       return this.LOWEST
     }
 
@@ -397,7 +375,6 @@ class MonkeyCompilerParser {
       if (p !== undefined) {
         return p
       }
-
       return this.LOWEST
     }
 
@@ -422,7 +399,7 @@ class MonkeyCompilerParser {
       props.token = caller.curToken
       props.keys = []
       props.values = []
-      while (caller.peekTokenIs(caller.lexer.RIGHT_BRACE) != true) {
+      while (caller.peekTokenIs(caller.lexer.RIGHT_BRACE) !== true) {
         caller.nextToken()
         //先解析expression:expression中左边的算术表达式
         const key = caller.parseExpression(caller.LOWEST)
@@ -430,7 +407,6 @@ class MonkeyCompilerParser {
         if (!caller.expectPeek(caller.lexer.COLON)) {
           return null 
         }
-
         caller.nextToken()
         //解析冒号右边的表达式
         const value = caller.parseExpression(caller.LOWEST)
@@ -442,7 +418,6 @@ class MonkeyCompilerParser {
           return null
         }
       }
-
       //最后必须以右括号结尾
       if (!caller.expectPeek(caller.lexer.RIGHT_BRACE)) {
         return null 
@@ -479,11 +454,10 @@ class MonkeyCompilerParser {
       if (!this.expectPeek(end)) {
         return null
       }
-
       return list
     }
 
-    parseIndexExpression(caller , left) {
+    parseIndexExpression(caller, left) {
       const props = {}
       props.token = caller.curToken
       props.left = left 
@@ -520,15 +494,13 @@ class MonkeyCompilerParser {
       const props = {}
       props.token = caller.curToken
       props.value = caller.curTokenIs(caller.lexer.TRUE)
-        //TODO
-      return new Boolean(props)
+      return new BooleanCtr(props)
     }
 
     parseGroupedExpression(caller) {
       caller.nextToken()
       const exp = caller.parseExpression(caller.LOWEST)
-      if (caller.expectPeek(caller.lexer.RIGHT_PARENT)
-          !== true) {
+      if (caller.expectPeek(caller.lexer.RIGHT_PARENT) !== true) {
         return null
       }
 
@@ -538,16 +510,13 @@ class MonkeyCompilerParser {
     parseIfExpression(caller) {
       const props = {}
       props.token = caller.curToken
-      if (caller.expectPeek(caller.lexer.LEFT_PARENT) !==
-       true) {
+      if (caller.expectPeek(caller.lexer.LEFT_PARENT) !== true) {
         return null
       }
-
       caller.nextToken()
-      props.condition = caller.parseExpression(caller.LOWEST)
 
-      if (caller.expectPeek(caller.lexer.RIGHT_PARENT) !==
-       true) {
+      props.condition = caller.parseExpression(caller.LOWEST)
+      if (caller.expectPeek(caller.lexer.RIGHT_PARENT) !== true) {
         return null
       }
 
@@ -560,14 +529,11 @@ class MonkeyCompilerParser {
 
       if (caller.peekTokenIs(caller.lexer.ELSE) === true) {
         caller.nextToken()
-        if (caller.expectPeek(caller.lexer.LEFT_BRACE) !==
-         true) {
+        if (caller.expectPeek(caller.lexer.LEFT_BRACE) !== true) {
           return null
         }
-
         props.alternative = caller.parseBlockStatement(caller)
       }
-
       return new IfExpression(props)
     }
 
@@ -575,18 +541,14 @@ class MonkeyCompilerParser {
       const props = {}
       props.token = caller.curToken
       props.statements = []
-
       caller.nextToken()
-
       while (caller.curTokenIs(caller.lexer.RIGHT_BRACE) !== true) {
         const stmt = caller.parseStatement()
         if (stmt != null) {
           props.statements.push(stmt)
         }
-
         caller.nextToken()
       }
-
       return new BlockStatement(props)
     }
 
@@ -736,22 +698,17 @@ class MonkeyCompilerParser {
        if (!this.expectPeek(this.lexer.IDENTIFIER)) {
           return null
        }
-
        props.identifier = this.createIdentifier()
-
        if (!this.expectPeek(this.lexer.ASSIGN_SIGN)) {
            return null
        }
-
        let exprProps = {}
        exprProps.token = this.curToken
        this.nextToken()
        props.expression = this.parseExpression(this.LOWEST)
-
        if (!this.expectPeek(this.lexer.SEMICOLON)) {
            return null
        }
-
        return new LetStatement(props)
     }
 
@@ -760,22 +717,19 @@ class MonkeyCompilerParser {
        props.token = this.curToken
        props.expression = this.parseExpression(this.LOWEST)
         const stmt = new ExpressionStatement(props);
-
         if (this.peekTokenIs(this.lexer.SEMICOLON)) {
            this.nextToken()
        }
-
        return stmt
     }
 
     parseExpression(precedence) {
         const prefix = this.prefixParseFns[this.curToken.getType()]
-        if (prefix === null) {
+        if (prefix == null) {
             console.log("no parsing function found for token " + 
               this.curToken.getLiteral())
             return null
         }
-
         let leftExp = prefix(this)
         while (this.peekTokenIs(this.lexer.SEMICOLON) !== true
             && precedence < this.peekPrecedence()) {
@@ -783,11 +737,9 @@ class MonkeyCompilerParser {
           if (infix === null) {
             return leftExp
           }
-
           this.nextToken()
           leftExp = infix(this, leftExp)
         }
-
         return leftExp
     }
 
@@ -806,6 +758,7 @@ class MonkeyCompilerParser {
 
       return new IntegerLiteral(intProps)
     }
+
       //前序表达式
     parsePrefixExpression(caller) {
       let props = {}
@@ -813,7 +766,6 @@ class MonkeyCompilerParser {
       props.operator = caller.curToken.getLiteral()  //operator-操作符
       caller.nextToken()
       props.expression = caller.parseExpression(caller.PREFIX)
-
       return new PrefixExpression(props)
     }
 

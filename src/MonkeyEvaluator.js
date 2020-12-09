@@ -1,5 +1,3 @@
-
-
 class BaseObject {
 	constructor () {
 		this.INTEGER_OBJ = "INTEGER"
@@ -33,13 +31,9 @@ class Hash extends BaseObject {
 	inspect () {
 		let s = "{"
 		for (let i = 0; i < this.keys.length; i++) {
-			var pair = "" + this.keys[i].inspect()
-			pair += ":"
-			pair += this.values[i].inspect()
-			pair += ","
+			const pair =`${this.keys[i].inspect()}: ${this.values[i].inspect()},`
 			s += pair
 		}
-
 		s += "}"
 		return s
 	}
@@ -56,8 +50,8 @@ class Array extends BaseObject {
 	}
 
 	inspect() {
-		var s = "["
-		for (var i = 0; i < this.elements.length; i++) {
+		let s = "["
+		for (let i = 0; i < this.elements.length; i++) {
 			s += this.elements[i].inspect()
 			s += ","
 		}
@@ -67,7 +61,7 @@ class Array extends BaseObject {
 	}
 }
 
-class String extends BaseObject {
+class StringCtr extends BaseObject {
 	constructor(props) {
 		super(props)
 		this.value = props.value
@@ -179,6 +173,7 @@ class FunctionLiteral extends BaseObject {
 		s += "){\n"
 		s += this.blockStatement.tokenLiteral
 		s += "\n}"
+		return s
 	}
 }
 
@@ -192,17 +187,17 @@ class FunctionCall extends BaseObject {
 }
 
 class Enviroment {
-	constructor(props) {
+	constructor() {
 		this.map = {}
 		this.outer = undefined
 	}
 	get(name) {
-		var obj = this.map[name]
-		if (obj != undefined) {
+		let obj = this.map[name]
+		if (obj !== undefined) {
 			return obj
 		}
 
-		if (this.outer != undefined) {
+		if (this.outer !== undefined) {
 			obj = this.outer.get(name)
 		}
 
@@ -214,25 +209,25 @@ class Enviroment {
 }
 
 class MonkeyEvaluator {
-	constructor (props) {
+	constructor () {
 		this.enviroment = new Enviroment()
 	}
 
 	newEnclosedEnvironment(outerEnv) {
-		var env = new Enviroment()
+		const env = new Enviroment()
 		env.outer = outerEnv
 		return env
 	}
 
-	builtins (name, args) {
+	builtins (name, args) { //name->api名称 args-->token类型
 		//实现内嵌API
 		const props = {}
 		switch (name) {
 			case "first":
-				if (args.length != 1) {
+				if (args.length !== 1) {
 					return this.newError("Wrong number of arguments when calling len")
 				}
-				if (args[0].type() != args[0].ARRAY_OBJ) {
+				if (args[0].type() !== args[0].ARRAY_OBJ) {
 					return this.newError("arguments of first must be ARRAY")
 				}
 				if (args[0].elements.length > 0) {
@@ -242,10 +237,10 @@ class MonkeyEvaluator {
 				}
 				return null
 			case "rest":
-				if (args.length != 1) {
+				if (args.length !== 1) {
 					return this.newError("Wrong number of arguments when calling len")
 				}
-				if (args[0].type() != args[0].ARRAY_OBJ) {
+				if (args[0].type() !== args[0].ARRAY_OBJ) {
 					return this.newError("arguments of first must be ARRAY")
 				}
 				if (args[0].elements.length > 1) {
@@ -257,13 +252,12 @@ class MonkeyEvaluator {
 				}
 				return null
 			case "append":
-				if (args.length != 2) {
+				if (args.length !== 2) {
 					return this.newError("Wrong number of arguments when calling len")
 				}
-				if (args[0].type() != args[0].ARRAY_OBJ) {
+				if (args[0].type() !== args[0].ARRAY_OBJ) {
 					return this.newError("arguments of first must be ARRAY")
 				}
-
 
 				props.elements = args[0].elements.slice(0)
 				props.elements.push(args[1])
@@ -273,21 +267,21 @@ class MonkeyEvaluator {
 				return obj
 
 			case "len":
-				if (args.length != 1) {
+				if (args.length !== 1) {
 					return this.newError("Wrong number of arguments when calling len")
 				}
 				switch (args[0].type()) {
 					case args[0].STRING_OBJ:
-
 						props.value = args[0].value.length
 						const obj = new Integer(props)
 						console.log("API len return: ",obj.inspect())
 						return obj
 					case args[0].ARRAY_OBJ:
-
 						props.value = args[0].elements.length
-						console.log("len of array " + args[0].inspect() + " is " +
-							props.value)
+						console.log("len of array "
+							+ args[0].inspect()
+							+ " is "
+							+ props.value)
 						return new Integer(props)
 				}
 		}
@@ -310,30 +304,30 @@ class MonkeyEvaluator {
 				props.elements = elements
 				return new Array(props)
 			case "IndexExpression":
-				var left = this.eval(node.left)
-				if (this.isError(left)) {
-					return left
+				const indexLeft = this.eval(node.left)
+				if (this.isError(indexLeft)) {
+					return indexLeft
 				}
 				const index = this.eval(node.index)
 				if (this.isError(index)) {
 					return index
 				}
-				const obj = this.evalIndexExpression(left, index)
+				const obj = this.evalIndexExpression(indexLeft , index)
 				if (obj != null) {
-					console.log("the index value is :"+index.value+" with content : "
+					console.log("the index value is :"
+						+index.value
+						+ " with content : "
 						+ obj.inspect())
 				}
 				return  obj
 			case "String":
 				props.value = node.tokenLiteral
-				return new String(props)
-
+				return new StringCtr(props)
 			case "LetStatement":
 				const letVal = this.eval(node.value)
 				if (this.isError(letVal)) {
 					return letVal
 				}
-
 				this.enviroment.set(node.name.tokenLiteral, letVal)
 				return letVal
 			case "Identifier":
@@ -342,7 +336,6 @@ class MonkeyEvaluator {
 				console.log("it is binding value is " + identifierValue.inspect())
 				return identifierValue
 			case "FunctionLiteral":
-
 				props.token = node.token
 				props.identifiers = node.parameters
 				props.blockStatement = node.body
@@ -350,35 +343,30 @@ class MonkeyEvaluator {
 				funObj.enviroment  = this.newEnclosedEnvironment(this.enviroment)
 				return  funObj
 			case "CallExpression":
-				console.log("execute a function with content:",
-					node.function.tokenLiteral)
-
-				console.log("evalute function call params:")
-				var args = this.evalExpressions(node.arguments)
+				console.log("execute a function with content:", node.function.tokenLiteral)
+				console.log("evaluate function call params:")
+				const args = this.evalExpressions(node.arguments)
 				if (args.length === 1 && this.isError(args[0])) {
 					return args[0]
 				}
-
-				var functionCall = this.eval(node.function)
+				const functionCall = this.eval(node.function)
 				if (this.isError(functionCall)) {
 					return this.builtins(node.function.tokenLiteral, args)
 				}
-
-				for (var i = 0; i < args.length; i++) {
+				for (let i = 0; i < args.length; i++) {
 					console.log(args[i].inspect())
 				}
-
-				var oldEnviroment = this.enviroment
+				const oldEnviroment = this.enviroment
 				//设置新的变量绑定环境
 				this.enviroment = functionCall.enviroment
 				//将输入参数名称与传入值在新环境中绑定
-				for (i = 0; i < functionCall.identifiers.length; i++) {
-					var name = functionCall.identifiers[i].tokenLiteral
-					var val = args[i]
+				for (let i = 0; i < functionCall.identifiers.length; i++) {
+					const name = functionCall.identifiers[i].tokenLiteral
+					const val = args[i]
 					this.enviroment.set(name, val)
 				}
 				//执行函数体内代码
-				var result = this.eval(functionCall.blockStatement)
+				const result = this.eval(functionCall.blockStatement)
 				//执行完函数后，里面恢复原有绑定环境
 				this.enviroment = oldEnviroment
 				if (result.type() === result.RETURN_VALUE_OBJECT) {
@@ -386,10 +374,7 @@ class MonkeyEvaluator {
 						result.valueObject.inspect())
 					return result.valueObject
 				}
-
 				return result
-
-
 			case "Integer":
 				console.log("Integer with value:", node.value)
 				props.value = node.value
@@ -401,45 +386,40 @@ class MonkeyEvaluator {
 			case "ExpressionStatement":
 				return this.eval(node.expression)
 			case "PrefixExpression":
-				var right = this.eval(node.right)
-				if (this.isError(right)) {
-					return right
+				const prefixRight = this.eval(node.right)
+				if (this.isError(prefixRight)) {
+					return prefixRight
 				}
-
-				var obj =  this.evalPrefixExpression(node.operator, right)
-				console.log("eval prefix expression: ", obj.inspect())
-				return obj
+				const preObj =  this.evalPrefixExpression(node.operator, prefixRight)
+				console.log("eval prefix expression: ", preObj.inspect())
+				return preObj
 			case "InfixExpression":
-				var left = this.eval(node.left)
-				if (this.isError(left)) {
-					return left
+				const infixLeft = this.eval(node.left)
+				if (this.isError(infixLeft)) {
+					return infixLeft
 				}
-				var right = this.eval(node.right)
-				if (this.isError(right)) {
-					return right
+				const infixRight = this.eval(node.right)
+				if (this.isError(infixRight)) {
+					return infixRight
 				}
-				return this.evalInfixExpression(node.operator, left, right)
+				return this.evalInfixExpression(node.operator, infixLeft, infixRight)
 			case "IfExpression":
 				return this.evalIfExpression(node)
 			case "blockStatement":
 				return this.evalStatements(node)
 			case "ReturnStatement":
-
 				props.value = this.eval(node.expression)
 				if (this.isError(props.value)) {
 					return props.value
 				}
-				var obj =  new ReturnValues(props)
-				console.log(obj.inspect())
-				return obj
+				const returnObj =  new ReturnValues(props)
+				console.log(returnObj.inspect())
+				return returnObj
 			default:
 				return new Null({})
 		}
-
-		return null
 	}
 
-	// change 4
 	evalHashLiteral(node) {
 		/*
 		先递归的解析哈希表的key，然后解析它的value,对于如下类型的哈希表代码
@@ -448,43 +428,36 @@ class MonkeyEvaluator {
 		{add(1,2) : byOne(3)}
 		编译器先执行add(1,2)得到3，然后执行byOne(3)得到4
 		*/
-		var props = {}
-		props.keys = []
-		props.values = []
-
-		for (var i = 0; i < node.keys.length; i++) {
-			var key = this.eval(node.keys[i])
+		const props = {
+			keys: [],
+			values:[]
+		}
+		for (let i = 0; i < node.keys.length; i++) {
+			const key = this.eval(node.keys[i])
 			if (this.isError(key)) {
 				return key
 			}
-
-			if (this.hashable(key) != true) {
-				return new this.Error("unhashable type:" +
+			if (this.hashtable(key) !== true) {
+				return  this.newError("unhashtable type:" +
 					key.type())
 			}
-
-			var value = this.eval(node.values[i])
+			const value = this.eval(node.values[i])
 			if (this.isError(value)) {
 				return value
 			}
-
 			props.keys.push(key)
 			props.values.push(value)
 		}
 
-		var hashObj = new Hash(props)
+		const hashObj = new Hash(props)
 		console.log("eval hash object: " + hashObj.inspect())
 		return hashObj
 	}
 
-	hashable(node) {
-		if (node.type() == node.INTEGER_OBJ ||
-			node.type() == node.STRING_OBJ ||
-			node.type() == node.BOOLEAN_OBJ) {
-			return true
-		}
-
-		return false
+	hashtable(node) {
+		return node.type() === node.INTEGER_OBJ ||
+			node.type() === node.STRING_OBJ ||
+			node.type() === node.BOOLEAN_OBJ;
 	}
 
 	evalIndexExpression(left, index) {
@@ -492,20 +465,18 @@ class MonkeyEvaluator {
 			index.type() === index.INTEGER_OBJ) {
 			return this.evalArrayIndexExpression(left, index)
 		}
-		// change 4
-		if (left.type() == left.HASH_OBJ) {
+		if (left.type() === left.HASH_OBJ) {
 			return this.evalHashIndexExpression(left, index)
 		}
 	}
 
-	//change 5
 	evalHashIndexExpression(hash, index) {
-		if (!this.hashable(index)) {
-			return new this.Error("unhashable type: " + index.type())
+		if (!this.hashtable(index)) {
+			return  this.newError("unhashtable type: " + index.type())
 		}
 
-		for (var i = 0; i < hash.keys.length; i++) {
-			if (hash.keys[i].value == index.value) {
+		for (let i = 0; i < hash.keys.length; i++) {
+			if (hash.keys[i].value === index.value) {
 				console.log("return hash value :" +
 					hash.values[i])
 				return hash.values[i]
@@ -515,26 +486,24 @@ class MonkeyEvaluator {
 		return null
 	}
 
-
 	evalArrayIndexExpression(array, index) {
-		var idx = index.value
-		var max = array.elements.length - 1
+		const idx = index.value
+		const max = array.elements.length - 1
 		if (idx < 0 || idx > max) {
-			return null
+			return this.newError("Array out of bounds ")
 		}
-
 		return array.elements[idx]
 	}
+
 	evalExpressions(exps) {
-		var result = []
-		for(var i = 0; i < exps.length; i++) {
-			var evaluated = this.eval(exps[i])
+		const result = []
+		for(let i = 0; i < exps.length; i++) {
+			const evaluated = this.eval(exps[i])
 			if (this.isError(evaluated)) {
 				return evaluated
 			}
 			result[i] = evaluated
 		}
-
 		return result
 	}
 
@@ -569,7 +538,7 @@ class MonkeyEvaluator {
 	}
 
 	isError(obj) {
-		if (obj != undefined) {
+		if (obj !== undefined) {
 			return obj.type() === obj.ERROR_OBJ
 		}
 
@@ -583,8 +552,8 @@ class MonkeyEvaluator {
 	}
 
 	evalIfExpression(ifNode) {
-		console.log("begin to eval if statment")
-		var condition = this.eval(ifNode.condition)
+		console.log("begin to eval if statement")
+		const condition = this.eval(ifNode.condition)
 
 		if (this.isError(condition)) {
 			return condition
@@ -603,27 +572,20 @@ class MonkeyEvaluator {
 	}
 
 	isTruthy(condition) {
-		if (condition.type() == condition.INTEGER_OBJ) {
-			if (condition.value != 0) {
-				return true
-			}
-			return false
+		if (condition.type() === condition.INTEGER_OBJ) {
+			return condition.value !== 0;
 		}
 
-		if (condition.type() == condition.BOOLEAN_OBJ) {
+		if (condition.type() === condition.BOOLEAN_OBJ) {
 			return condition.value
 		}
 
-		if (condition.type() == condition.NULL_OBJ) {
-			return false
-		}
-
-		return true
+		return condition.type() !== condition.NULL_OBJ;
 	}
 
 	evalStatements(node) {
-		var result = null
-		for (var i = 0; i < node.statements.length; i++) {
+		let result = null
+		for (let i = 0; i < node.statements.length; i++) {
 			result = this.eval(node.statements[i])
 			if (result.type() === result.RETURN_VALUE_OBJECT
 				|| result.type() === result.ERROR_OBJ) {
@@ -636,30 +598,34 @@ class MonkeyEvaluator {
 
 	evalInfixExpression(operator, left, right) {
 		if (left.type() !== right.type()) {
-			return  this.newError("type mismatch: " +
-				left.type() + " and " + right.type())
+			return  this.newError(
+				"type mismatch: "
+				+ left.type() + " and " + right.type()
+			)
 		}
 
-		if (left.type() === left.INTEGER_OBJ &&
-			right.type() === right.INTEGER_OBJ) {
+		if (left.type() === left.INTEGER_OBJ
+			&& right.type() === right.INTEGER_OBJ) {
 			return this.evalIntegerInfixExpression(
 				operator, left, right)
 		}
 
-		if (left.type() === left.STRING_OBJ &&
-			right.type() === right.STRING_OBJ) {
-			return this.evalStringInfixExpression(operator,
-				left, right)
+		if (left.type() === left.STRING_OBJ
+			&& right.type() === right.STRING_OBJ) {
+			return this.evalStringInfixExpression(
+				operator, left, right)
 		}
 
-		var props = {}
-		if (operator == '==') {
-			props.value = (left.vaule == right.value)
-			console.log("result on boolean operation of " + operator
-				+ " is " + props.value)
+		const props = {}
+		if (operator === '===') {
+			props.value = (left.value === right.value)
+			console.log("result on boolean operation of "
+				+ operator
+				+ " is "
+				+ props.value)
 			return new BooleanCtr(props)
-		} else if (operator == '!=') {
-			props.value = (left.value != right.value)
+		} else if (operator === '!==') {
+			props.value = (left.value !== right.value)
 			console.log("result on boolean operation of " + operator
 				+ " is " + props.value)
 			return new BooleanCtr(props)
@@ -669,7 +635,7 @@ class MonkeyEvaluator {
 	}
 
 	evalStringInfixExpression(operator, left, right) {
-		if (operator != "+") {
+		if (operator !== "+") {
 			return this.newError("unknown operator for string operation")
 		}
 
@@ -678,14 +644,14 @@ class MonkeyEvaluator {
 		const props = {}
 		props.value = leftVal + rightVal
 		console.log("reuslt of string add is: ", props.value)
-		return new String(props)
+		return new StringCtr(props)
 	}
 
 	evalIntegerInfixExpression(operator, left, right) {
-		var leftVal = left.value
-		var rightVal = right.value
-		var props = {}
-		var resultType = "integer"
+		const leftVal = left.value
+		const rightVal = right.value
+		const props = {}
+		let resultType = "integer"
 
 		switch (operator) {
 			case "+":
@@ -702,11 +668,11 @@ class MonkeyEvaluator {
 				break;
 			case "==":
 				resultType = "boolean"
-				props.value = (leftVal === rightVal)
+				props.value = (leftVal == rightVal)
 				break;
 			case "!=":
 				resultType = "boolean"
-				props.value = (leftVal !== rightVal)
+				props.value = (leftVal != rightVal)
 				break
 			case ">":
 				resultType = "boolean"
@@ -719,9 +685,8 @@ class MonkeyEvaluator {
 			default:
 				return this.newError("unknown operator for Integer")
 		}
-		console.log("eval infix expression result is:",
-			props.value)
-		var result = null
+		console.log("eval infix expression result is:", props.value)
+		let result = null
 		if (resultType === "integer") {
 			result = new Integer(props)
 		} else if (resultType === "boolean") {
@@ -741,7 +706,7 @@ class MonkeyEvaluator {
 				return this.newError("unknown operator:", operator, right.type())
 		}
 	}
-
+	//取反
 	evalBangOperatorExpression(right) {
 		var props = {}
 		if (right.type() === right.BOOLEAN_OBJ) {
@@ -755,11 +720,7 @@ class MonkeyEvaluator {
 		}
 
 		if (right.type() === right.INTEGER_OBJ) {
-			if (right.value === 0) {
-				props.value = true
-			} else {
-				props.value = false
-			}
+			props.value = right.value === 0;
 		}
 
 		if (right.type() === right.NULL_OBJ) {
@@ -771,15 +732,12 @@ class MonkeyEvaluator {
 
 	evalMinusPrefixOperatorExpression(right) {
 		if (right.type() !== right.INTEGER_OBJ) {
-			return new this.newError("unknown operaotr:- ", right.type())
+			return this.newError("unknown operator:- ", right.type())
 		}
-
-		var props = {}
+		const props = {}
 		props.value = -right.value
 		return new Integer(props)
 	}
-
-
 }
 
 export default MonkeyEvaluator
