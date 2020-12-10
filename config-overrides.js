@@ -1,7 +1,11 @@
+const { injectBabelPlugin } = require("react-app-rewired");
+
 module.exports = function override(config, env) {
-    config.module.rules.push({
-        test: /\.worker\.js$/,
-        use: { loader: 'worker-loader' }
-      })
+    // antd按需加载
+    config = injectBabelPlugin(
+        ["import", { libraryName: "antd", libraryDirectory: "es", style: "css" }],
+        config
+    );
+
     return config;
-  }
+};

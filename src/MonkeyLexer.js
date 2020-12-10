@@ -215,6 +215,7 @@ class MonkeyLexer {
 			if (this.peekChar() === '=') {
 			    this.readChar()
 				if (this.peekChar() === '=') {
+					this.readChar()
 					tok = new Token(this.EQ, "===", lineCount)
 				}
 			} else {
@@ -237,6 +238,7 @@ class MonkeyLexer {
 			if (this.peekChar() === '=') {
 			    this.readChar()
 				if (this.peekChar() === '=') {
+					this.readChar()
 					tok = new Token(this.NOT_EQ, "!==", lineCount)
 				}
 			} else {

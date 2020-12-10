@@ -3,3 +3,8 @@ body {
   padding: 5px;
   font-family: sans-serif;
 }
+.cover{
+  position:fixed;
+  outline:5000px solid rgba(0, 0, 0, 0.3);
+  z-index: 99999;
+}

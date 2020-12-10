@@ -107,14 +107,9 @@ class BooleanCtr extends BaseObject {
 }
 
 class Null extends BaseObject {
-	constructor (props) {
-		super(props)
-	}
-
 	type () {
 		return this.NULL_OBJ
 	}
-
 	inspect () {
 		return "null"
 	}
@@ -666,13 +661,13 @@ class MonkeyEvaluator {
 			case "/":
 				props.value = leftVal / rightVal
 				break;
-			case "==":
+			case "===":
 				resultType = "boolean"
-				props.value = (leftVal == rightVal)
+				props.value = (leftVal === rightVal)
 				break;
-			case "!=":
+			case "!==":
 				resultType = "boolean"
-				props.value = (leftVal != rightVal)
+				props.value = (leftVal !== rightVal)
 				break
 			case ">":
 				resultType = "boolean"

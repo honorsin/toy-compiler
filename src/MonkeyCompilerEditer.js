@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React, { Component} from "react";
 import rangy from "rangy/lib/rangy-selectionsaverestore";
 import MonkeyLexer from "./MonkeyLexer";
-import * as bootstrap from "react-bootstrap";
+import { Popover } from 'antd';
 
 class MonkeyCompilerEditer extends Component {
   constructor(props) {
@@ -25,7 +25,6 @@ class MonkeyCompilerEditer extends Component {
     this.lineSpanNode = "LineSpan";
     this.identifierClass = "Identifier";
     this.breakPointClass = "breakpoint";
-    //this.spanToTokenMap = {};
 
     this.keyToIngore = [
       "Enter",
@@ -42,7 +41,6 @@ class MonkeyCompilerEditer extends Component {
     rule += "margin-right: .5em;color: #666;";
     rule += "pointer-events:all;";
     document.styleSheets[1].addRule(ruleClass1, rule);
-
     this.bpMap = {};
     this.ide = null;
   }
@@ -60,10 +58,6 @@ class MonkeyCompilerEditer extends Component {
         content: ""
       }
     })
-  }
-
-  getContent() {
-    return this.divInstance.innerText;
   }
   // dom树，找到节点，提供给lexer进行分词
   changeNode(n) {
@@ -328,7 +322,6 @@ class MonkeyCompilerEditer extends Component {
         parent.removeChild(this.currentElement);
       }
     }
-
     this.identifierElementArray = [];
   }
 
@@ -395,7 +388,6 @@ class MonkeyCompilerEditer extends Component {
         currentLine.replaceChild(t, child);
       }
     }
-
     //把所有相邻的text node 合并成一个
     currentLine.normalize();
     this.identifierElementArray = [];
@@ -420,17 +412,17 @@ class MonkeyCompilerEditer extends Component {
     }
   }
 
-  // onMouseEnter() {
-  //   /*
-  //       要想让popover控件出现，必须接收mouseenter时间，
-  //       只有把pointerEvent设置为空而不是none时，这个时间才能传递给
-  //       span
-  //       */
-  //   const lineSpans = document.getElementsByClassName(this.lineSpanNode);
-  //   for (let i = 0; i < lineSpans.length; i++) {
-  //     lineSpans[i].style.pointerEvents = "";
-  //   }
-  // }
+  onMouseEnter() {
+    /*
+        要想让popover控件出现，必须接收mouseenter时间，
+        只有把pointerEvent设置为空而不是none时，这个时间才能传递给
+        span
+        */
+    const lineSpans = document.getElementsByClassName(this.lineSpanNode);
+    for (let i = 0; i < lineSpans.length; i++) {
+      lineSpans[i].style.pointerEvents = "";
+    }
+  }
 
   render() {
     let textAreaStyle = {
@@ -450,8 +442,7 @@ class MonkeyCompilerEditer extends Component {
           contentEditable
         >
         </div>
-
-        <bootstrap.Popover
+        <Popover
           placement={this.state.popoverStyle.placement}
           positionLeft={this.state.popoverStyle.positionLeft}
           positionTop={this.state.popoverStyle.positionTop}
@@ -459,7 +450,7 @@ class MonkeyCompilerEditer extends Component {
           id="identifier-show"
         >
           {this.state.popoverStyle.content}
-        </bootstrap.Popover>
+        </Popover>
       </div>
     );
   }
