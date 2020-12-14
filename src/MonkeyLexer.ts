@@ -335,9 +335,9 @@ class MonkeyLexer {
 	//this.observer指向notifyTokenCreation
 	notifyObserver(token) {
 		if (this.observer !== null) {
-			this.observer(token,
+			this.observer.notifyTokenCreation(token,
 			this.observerContext, this.position - 1, 
-			this.readPosition, this.case)
+			this.readPosition)
 		}
 		
 	}
