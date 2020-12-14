@@ -204,8 +204,9 @@ class Enviroment {
 }
 
 class MonkeyEvaluator {
-	constructor () {
+	constructor (worker) {
 		this.enviroment = new Enviroment()
+		this.evalWorker = worker
 	}
 
 	newEnclosedEnvironment(outerEnv) {
@@ -283,15 +284,40 @@ class MonkeyEvaluator {
 
 		return this.newError("unknown function call")
 	}
-
-	eval (node) {
+	setExecInfo(node) {
 		const props = {}
+		if (node !== undefined) {
+			props['line'] = node.getLineNumber()
+		}
+
+		const env = {}
+		for (const s in this.enviroment.map) {
+			env[s] = this.enviroment.map[s].inspect()
+		}
+		props['env'] = env
+		return props
+	}
+	//单步调试
+	pauseBeforeExec(node) {
+		const props = this.setExecInfo(node)
+		this.evalWorker.sendExecInfo("beforeExec", props)
+		this.evalWorker.waitBeforeEval()
+	}
+	eval (node) {
+		const props = {
+			value: "",
+			identifiers: "",
+			token:"",
+			elements: "",
+			blockStatement: ""
+		}
 		switch (node.type) {
 			case "program":
 				return this.evalProgram(node)
 			case "HashLiteral":
 				return this.evalHashLiteral(node)
 			case "ArrayLiteral":
+				this.pauseBeforeExec(node)
 				const elements = this.evalExpressions(node.elements)
 				if (elements.length === 1 && this.isError(elements[0])) {
 					return elements[0]
@@ -299,6 +325,7 @@ class MonkeyEvaluator {
 				props.elements = elements
 				return new Array(props)
 			case "IndexExpression":
+				this.pauseBeforeExec(node)
 				const indexLeft = this.eval(node.left)
 				if (this.isError(indexLeft)) {
 					return indexLeft
@@ -319,6 +346,7 @@ class MonkeyEvaluator {
 				props.value = node.tokenLiteral
 				return new StringCtr(props)
 			case "LetStatement":
+				this.pauseBeforeExec(node)
 				const letVal = this.eval(node.value)
 				if (this.isError(letVal)) {
 					return letVal
@@ -338,6 +366,7 @@ class MonkeyEvaluator {
 				funObj.enviroment  = this.newEnclosedEnvironment(this.enviroment)
 				return  funObj
 			case "CallExpression":
+				this.pauseBeforeExec(node)
 				console.log("execute a function with content:", node.function.tokenLiteral)
 				console.log("evaluate function call params:")
 				const args = this.evalExpressions(node.arguments)
@@ -379,8 +408,10 @@ class MonkeyEvaluator {
 				console.log("Boolean with value:", node.value)
 				return new BooleanCtr(props)
 			case "ExpressionStatement":
+				this.pauseBeforeExec(node)
 				return this.eval(node.expression)
 			case "PrefixExpression":
+				this.pauseBeforeExec(node)
 				const prefixRight = this.eval(node.right)
 				if (this.isError(prefixRight)) {
 					return prefixRight
@@ -389,6 +420,7 @@ class MonkeyEvaluator {
 				console.log("eval prefix expression: ", preObj.inspect())
 				return preObj
 			case "InfixExpression":
+				this.pauseBeforeExec(node)
 				const infixLeft = this.eval(node.left)
 				if (this.isError(infixLeft)) {
 					return infixLeft
@@ -399,10 +431,12 @@ class MonkeyEvaluator {
 				}
 				return this.evalInfixExpression(node.operator, infixLeft, infixRight)
 			case "IfExpression":
+				this.pauseBeforeExec(node)
 				return this.evalIfExpression(node)
 			case "blockStatement":
 				return this.evalStatements(node)
 			case "ReturnStatement":
+				this.pauseBeforeExec(node)
 				props.value = this.eval(node.expression)
 				if (this.isError(props.value)) {
 					return props.value
@@ -411,7 +445,7 @@ class MonkeyEvaluator {
 				console.log(returnObj.inspect())
 				return returnObj
 			default:
-				return new Null({})
+				return new Null()
 		}
 	}
 
@@ -515,20 +549,26 @@ class MonkeyEvaluator {
 		let result = null
 		for (let i = 0; i < program.statements.length; i++) {
 			result = this.eval(program.statements[i])
+
+			const props = this.setExecInfo()
 			if (result.type() === result.RETURN_VALUE_OBJECT) {
+				this.evalWorker.sendExecInfo("finishExec", props)
 				return result.valueObject
 			}
 
 			if (result.type() === result.NULL_OBJ) {
+				this.evalWorker.sendExecInfo("finishExec", props)
 				return result
 			}
 
 			if (result.type === result.ERROR_OBJ) {
+				this.evalWorker.sendExecInfo("finishExec", props)
 				console.log(result.msg)
 				return result
 			}
 		}
-
+		var props = this.setExecInfo()
+		this.evalWorker.sendExecInfo("finishExec", props)
 		return result
 	}
 
@@ -569,6 +609,7 @@ class MonkeyEvaluator {
 	isTruthy(condition) {
 		if (condition.type() === condition.INTEGER_OBJ) {
 			return condition.value !== 0;
+
 		}
 
 		if (condition.type() === condition.BOOLEAN_OBJ) {
@@ -576,6 +617,8 @@ class MonkeyEvaluator {
 		}
 
 		return condition.type() !== condition.NULL_OBJ;
+
+
 	}
 
 	evalStatements(node) {

@@ -5,7 +5,7 @@ class Node {
         this.type = ""
         this.lineNumber =  Number.MAX_SAFE_INTEGER
         for (const i in props) {
-          if (props[i]!= null && props[i].hasOwnProperty("getLineNumber" )) {
+          if (props[i].getLineNumber !== undefined) {
             console.log("line: " + props[i].getLineNumber())
             if (props[i].getLineNumber() < this.lineNumber) {
               this.lineNumber = props[i].getLineNumber()

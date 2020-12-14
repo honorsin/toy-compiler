@@ -14,7 +14,6 @@ function handleMessage(event) {
     this.parser = new MonkeyCompilerParser(this.lexer)
     //开始语法解析
     this.program = this.parser.parseProgram()
-    var props = {}
     this.evaluator = new MonkeyEvaluator(this)
     this.evaluator.eval(this.program)
 }

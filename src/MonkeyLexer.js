@@ -32,6 +32,7 @@ class MonkeyLexer {
 
 		this.observer = null
 		this.observerContext = null
+		this.case = null
 	}
 
 	initTokenType() {
@@ -151,10 +152,11 @@ class MonkeyLexer {
 		this.keyWordMap["return"] = new Token(this.RETURN, "return", 0)
 	}
 
-	setLexingObserver(o, context) {
+	setLexingObserver(o, context, newCase) {
 		if (o !== null && o !== undefined) {
 			this.observer = o
 			this.observerContext = context
+			this.case = newCase
 		}
 	}
 
@@ -330,12 +332,12 @@ class MonkeyLexer {
 
 		return str 
 	}
-
+	//this.observer指向notifyTokenCreation
 	notifyObserver(token) {
 		if (this.observer !== null) {
-			this.observer.notifyTokenCreation(token, 
+			this.observer(token,
 			this.observerContext, this.position - 1, 
-			this.readPosition)
+			this.readPosition, this.case)
 		}
 		
 	}
@@ -385,7 +387,7 @@ class MonkeyLexer {
 		}
 	}
 
-	lexing() {
+	lexing(lexer) {
 		this.readChar()
 		this.tokens = []
 		let token = this.nextToken()
