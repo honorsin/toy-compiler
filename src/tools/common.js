@@ -1,4 +1,4 @@
-import { CaretRightOutlined } from '@ant-design/icons';
+
 export function changeSpaceToNBSP(str)  {
     //空格转换成UNICODE空格编码'\u00a0'，用以保留空格
     let s = "";

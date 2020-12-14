@@ -1,23 +1,22 @@
 import React , {Component, Fragment} from 'react'
 import {Button, PageHeader} from 'antd'
+
 import { CaretRightOutlined } from '@ant-design/icons';
-import MonkeyLexer from './MonkeyLexer'
+import MonkeyLexer from './MonkeyLexer.js'
 import MonkeyCompilerEditer from './MonkeyCompilerEditer'
 import MonkeyCompilerParser from './MonkeyCompilerParser' //不要删除，调试产生sourcemap
 import MonkeyEvaluator from './MonkeyEvaluator'
 import Worker from './channel.worker'
 import './css/MonkeyCompilerIDE.css'
 import {highlightLineByLine} from './tools/common.js'
-
 class MonkeyCompilerIDE extends Component {
     constructor(props) {
         super(props)
         this.lexer = new MonkeyLexer("")
-        this.ref = React.createRef()
         this.state = {stepEnable: false}
         this.breakPointMap = null
         this.channelWorker = new Worker()
-        this.ide = null
+        this.inputInstance = null
     }
 
     updateBreakPointMap(bpMap) {
@@ -25,7 +24,8 @@ class MonkeyCompilerIDE extends Component {
     }
 
     onLexingClick() {
-        this.channelWorker.postMessage(['code', this.ref.current.innerText])
+        this.inputInstance.setIDE(this)
+        this.channelWorker.postMessage(['code', this.inputInstance.getContent()])
         this.channelWorker.addEventListener('message',
             this.handleMsgFromChannel.bind(this))
     }
@@ -72,7 +72,7 @@ class MonkeyCompilerIDE extends Component {
                 />
                 <MonkeyCompilerEditer
                     keyWords={this.lexer.getKeyWords()}
-                    ref = {this.ref}
+                    ref = {(ref) => {this.inputInstance = ref}}
                     ide = {this.ide}
                    />
                 <Button

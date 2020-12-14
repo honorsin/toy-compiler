@@ -279,10 +279,13 @@ class MonkeyEvaluator {
 							+ " is "
 							+ props.value)
 						return new Integer(props)
+					default:
+						return this.newError("bad data type")
 				}
+			default:
+				return this.newError("unknown function call")
 		}
 
-		return this.newError("unknown function call")
 	}
 	setExecInfo(node) {
 		const props = {}
@@ -567,7 +570,7 @@ class MonkeyEvaluator {
 				return result
 			}
 		}
-		var props = this.setExecInfo()
+		const props = this.setExecInfo()
 		this.evalWorker.sendExecInfo("finishExec", props)
 		return result
 	}
